@@ -56,7 +56,9 @@ SOURCES += \
     MSProtocol/rctuning_protocol_process.cpp \
     MSProtocol/pid_protocol_process.cpp \
     MSProtocol/rcdeadbands_protocol_process.cpp \
-    MSProtocol/motorpins_protocol_process.cpp
+    MSProtocol/motorpins_protocol_process.cpp \
+    Meters/QGauge/qgauge.cpp \
+    Meters/QGauge/qgaugedrawfunctions.cpp \
 
 
 HEADERS += \
@@ -109,7 +111,8 @@ HEADERS += \
     MSProtocol/rctuning_protocol_process.h \
     MSProtocol/pid_protocol_process.h \
     MSProtocol/rcdeadbands_protocol_process.h \
-    MSProtocol/motorpins_protocol_process.h
+    MSProtocol/motorpins_protocol_process.h \
+    Meters/QGauge/qgauge.h \
 
 FORMS += \
         mainwindow.ui \
@@ -123,5 +126,9 @@ INCLUDEPATH += E:/OSG/osg_x86/include
 LIBS += -LE:/OSG/osg_x86/lib/ -lOpenThreadsd -losgd -losgDBd -losgUtild -losgGAd -losgViewerd -losgTextd
 
 RESOURCES += \
-    resources/qfi.qrc
+    resources/qfi.qrc \
+
+
+DISTFILES += \
+
 

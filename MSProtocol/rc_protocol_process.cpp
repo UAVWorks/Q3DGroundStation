@@ -19,6 +19,7 @@ RcProtocolProcess::~RcProtocolProcess() {
 * Time: 2018/4/6 cdeveloper
 */
 void RcProtocolProcess::MspRcDownToDC() {
+  rc_down_dc_.message_header = rc_down_.message_header;
   rc_down_dc_.roll = static_cast<double>(rc_down_.roll);
   rc_down_dc_.pitch = static_cast<double>(rc_down_.pitch);
   rc_down_dc_.yaw = static_cast<double>(rc_down_.yaw);
@@ -27,6 +28,7 @@ void RcProtocolProcess::MspRcDownToDC() {
   rc_down_dc_.aux2 = static_cast<double>(rc_down_.aux2);
   rc_down_dc_.aux3 = static_cast<double>(rc_down_.aux3);
   rc_down_dc_.aux4 = static_cast<double>(rc_down_.aux4);
+  rc_down_dc_.crc = rc_down_.crc;
 }
 
 

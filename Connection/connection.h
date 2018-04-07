@@ -12,8 +12,11 @@ class QSerialPort;
 class QTimer;
 struct MspAttitudeDownDC;
 struct MspMotorDownDC;
+struct MspRcDownDC;
+
 class AttitudeProtocolProcess;
 class MotorProtocolProcess;
+class RcProtocolProcess;
 
 class Connection : public QWidget
 {
@@ -26,6 +29,7 @@ public:
 signals:
   void UpdateAttitude(const MspAttitudeDownDC &maddc);
   void UpdateMotor(const MspMotorDownDC &mmddc);
+  void UpdateRC(const MspRcDownDC &mrddc);
 
 
 private slots:
@@ -40,9 +44,10 @@ private:
   Ui::Connection *ui;
   TcpClient *tcp_client_;
   QSerialPort *serial_;
+  QTimer *timer_;
   AttitudeProtocolProcess *attitude_process_;
   MotorProtocolProcess *motor_process_;
-  QTimer *timer_;
+  RcProtocolProcess *rc_process_;
 };
 
 #endif // CONNECTION_H

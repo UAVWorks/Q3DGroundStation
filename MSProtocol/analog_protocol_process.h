@@ -13,7 +13,7 @@ public:
   ~AnalogProtocolProcess();
 
   MspAnalogDown analog_down_;
-  MspAltitudeDownDC analog_down_dc_;
+  MspAnalogDownDC analog_down_dc_;
 
   void MspAnalogDownToDC();
 

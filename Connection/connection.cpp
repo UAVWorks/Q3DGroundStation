@@ -10,6 +10,8 @@
 #include "../MSProtocol/attitude_protocol_process.h"
 #include "../MSProtocol/motor_protocol_process.h"
 #include "../MSProtocol/msp_protocol_process_interface.h"
+#include "../MSProtocol/rc_protocol_process.h"
+
 
 Connection::Connection(QWidget *parent) :
   QWidget(parent),
@@ -18,7 +20,8 @@ Connection::Connection(QWidget *parent) :
   serial_(new QSerialPort(this)),
   timer_(new QTimer(this)),
   attitude_process_(new AttitudeProtocolProcess),
-  motor_process_(new MotorProtocolProcess)
+  motor_process_(new MotorProtocolProcess),
+  rc_process_(new RcProtocolProcess)
 {
   ui->setupUi(this);
 
@@ -152,6 +155,10 @@ void Connection::ReadData() {
       motor_process_->MspMotorDownToDC();
       emit UpdateMotor(motor_process_->motor_down_dc);
       break;
+    case MSP_RC:
+      rc_process_->UnPack(in_data);
+      rc_process_->MspRcDownToDC();
+      emit UpdateRC(rc_process_->rc_down_dc_);
     default:
       break;
   }
@@ -186,14 +193,14 @@ void Connection::on_request_data_btn_clicked()
 }
 
 
-/********************************************************
-* 函数名: timer_update
-* 功 能: Timer slot fun, pack data and call WriteData
-* 参 数: void
-* 返回值: void
-* 备 注:
-* 时 间: 2018/4/4 陈登龙
-*********************************************************/
+/**
+* Function name:
+* Function:
+* Params: void
+* Return: void
+* Note:
+* Time: 2018/4/6 cdeveloper
+*/
 void Connection::TimerUpdate() {
   // send data to serial
   QByteArray out_data;
@@ -204,8 +211,11 @@ void Connection::TimerUpdate() {
 
   // pack motor
   motor_process_->Pack(out_data);
-
   WriteData(out_data);
+
+  // pack rc
+  //rc_process_->Pack(out_data);
+  //WriteData(out_data);
 }
 
 

@@ -27,15 +27,17 @@ bool AttitudeProtocolProcess::Pack(QByteArray &out_data)
 {
   out_data.clear();
 
-  // set out_data MSP_VERSION
+  // $
   out_data.append(kHeaderStart);
+  // M
   out_data.append(kHeaderM);
+  // <
   out_data.append(kGcsToUav);
-  // size = 0
+  // size
   out_data.append(static_cast<char>(0));
-  // cmd = 108
+  // cmd
   out_data.append(static_cast<char>(MSP_ATTITUDE));
-  // crc = 0 ^ 108
+  // crc
   out_data.append(static_cast<char>(0 ^ MSP_ATTITUDE));
 
   /*
@@ -91,8 +93,7 @@ bool AttitudeProtocolProcess::UnPack(BaseData *base_data, const std::vector<boos
 * 备注: 该函数有另一个重载版本
 * 时间: 2018/3/23 陈登龙
 *****************************************************************/
-bool AttitudeProtocolProcess::UnPack(const QByteArray &in_data)
-{
+bool AttitudeProtocolProcess::UnPack(const QByteArray &in_data) {
   // unpack header
   GetMessageHeaderInfo(in_data, attitude_down_.message_header);
 
@@ -118,11 +119,11 @@ bool AttitudeProtocolProcess::UnPack(const QByteArray &in_data)
 * 时间: 2018/3/23 陈登龙
 *****************************************************************/
 void AttitudeProtocolProcess::MspAttitudeDownToDC() {
-    attitude_dc_.message_header = attitude_down_.message_header;
-    attitude_dc_.roll = static_cast<double>(attitude_down_.roll) / 10.0;
-    attitude_dc_.pitch = static_cast<double>(attitude_down_.pitch) / 10.0;
-    attitude_dc_.yaw = static_cast<double>(attitude_down_.yaw) / 10.0;
-    attitude_dc_.crc = attitude_down_.crc;
+  attitude_dc_.message_header = attitude_down_.message_header;
+  attitude_dc_.roll = static_cast<double>(attitude_down_.roll) / 10.0;
+  attitude_dc_.pitch = static_cast<double>(attitude_down_.pitch) / 10.0;
+  attitude_dc_.yaw = static_cast<double>(attitude_down_.yaw) / 10.0;
+  attitude_dc_.crc = attitude_down_.crc;
 }
 
 
