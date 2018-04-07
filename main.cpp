@@ -19,6 +19,7 @@
 #include "MSProtocol/msp_protocol_convert_to_real_data.h"
 #include "Meters/meters.h"
 #include "HUD/hud.h"
+#include "Curve/data_curve.h"
 
 #include "3D/qt_osg_widget.h"
 
@@ -72,10 +73,13 @@ void SplitterWindow(MainWindow *w)
     QTextEdit *editor3 = new QTextEdit(QObject::tr("Progress"));
     //Meters *meters = new Meters;
 
-    QTextEdit *editor4 = new QTextEdit(QObject::tr("DataBase"));
+    //QTextEdit *editor4 = new QTextEdit(QObject::tr("DataBase"));
+    DataCurve *curve = new DataCurve;
+
     splitter3->addWidget(editor3);
     //splitter3->addWidget(meters);
-    splitter3->addWidget(editor4);
+    //splitter3->addWidget(editor4);
+    splitter3->addWidget(curve);
 
     //splitter2->addWidget(editor2);
     splitter2->addWidget(meters);

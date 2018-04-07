@@ -59,6 +59,8 @@ SOURCES += \
     MSProtocol/motorpins_protocol_process.cpp \
     Meters/QGauge/qgauge.cpp \
     Meters/QGauge/qgaugedrawfunctions.cpp \
+    Curve/data_curve.cpp \
+    Meters/QVUMeter/qvumeter.cpp
 
 
 HEADERS += \
@@ -113,22 +115,40 @@ HEADERS += \
     MSProtocol/rcdeadbands_protocol_process.h \
     MSProtocol/motorpins_protocol_process.h \
     Meters/QGauge/qgauge.h \
+    Curve/data_curve.h \
+    Meters/QVUMeter/qvumeter.h
 
 FORMS += \
         mainwindow.ui \
     Connection/connection.ui \
     Meters/meters.ui \
     Meters/meters.ui \
-    HUD/hud.ui
+    HUD/hud.ui \
+    Curve/datacurve.ui
 
-# Add OSG inc and lib path
+# OSG begin config
 INCLUDEPATH += E:/OSG/osg_x86/include
 LIBS += -LE:/OSG/osg_x86/lib/ -lOpenThreadsd -losgd -losgDBd -losgUtild -losgGAd -losgViewerd -losgTextd
+#LIBS += -LE:/OSG/osg_x86/lib/ -lOpenThreads -losg -losgDB -losgUtil -losgGA -losgViewer -losgText
+# OSG end config
+
+# Qwt begin config
+DEFINES += QT_DLL QWT_DLL
+LIBS += -LE:\Soft\Qt\Qt5.9.4\5.9.4\msvc2013\lib -lqwtd
+#LIBS += -LE:\Soft\Qt\Qt5.9.4\5.9.4\msvc2013\lib -lqwt
+INCLUDEPATH += E:\Soft\Qt\Qt5.9.4\5.9.4\msvc2013\include\Qwt
+# Qwt end config
+
+# Analogwidgets begin config
+#INCLUDEPATH += ./analogwidgets/
+#LIBS += ./analogwidgets.lib # 此时的库在 build 目录下
+#LIBS += -LE:\AnalogWidgets -lanalogwidgets # debug 库不能使用
+# Analogwidgets end config
+
 
 RESOURCES += \
     resources/qfi.qrc \
-
+    resources/qvumeter.qrc
 
 DISTFILES += \
-
-
+    resources/qvumeter.png
