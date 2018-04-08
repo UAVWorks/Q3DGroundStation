@@ -1,2 +1,2 @@
-# 3DGroundControl
-3D Flight Control System Base on QT
+# 3DGroundStation
+3D Flight Control Station Base on QT
