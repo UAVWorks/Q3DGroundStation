@@ -8,7 +8,7 @@ QT       += core gui svg serialport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = 3DGroundControl
+TARGET = Q3DGroundStation
 TEMPLATE = app
 
 
