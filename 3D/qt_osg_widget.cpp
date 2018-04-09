@@ -16,8 +16,6 @@
 #include <osgGA/TrackballManipulator>
 #include <osgDB/ReadFile>
 
-#include "../MSProtocol/msp_protocol_convert_to_real_data.h"
-
 // suggest using callback
 #define USING_ROTATE_CALLBACK 1
 
@@ -168,7 +166,7 @@ osgGA::EventQueue* QtOSGWidget::getEventQueue() const {
 }
 
 
-
+/*
 void QtOSGWidget::Update3D(const MspAttitudeDownDC &maddc) {
 #if USING_ROTATE_CALLBACK
   rotate_callback_->SetRotateValue(maddc.roll, maddc.pitch, maddc.yaw);
@@ -178,6 +176,8 @@ void QtOSGWidget::Update3D(const MspAttitudeDownDC &maddc) {
   pat_->setAttitude(osg::Quat(maddc.roll, osg::X_AXIS, maddc.pitch, osg::Y_AXIS, maddc.yaw, osg::Z_AXIS));
 #endif
 }
+*/
+
 
 void QtOSGWidget::UpdateTimer(){
   // update 3D model

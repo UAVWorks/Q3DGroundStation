@@ -20,14 +20,10 @@
 
 #include <string>
 
-#include "../Communication/st_asio_wrapper_base.h"
-#include "../Communication/st_asio_wrapper_tcp_client.h"
-#include "../MSProtocol/attitude_protocol_process.h"
-//#include "../MessageBus/MessageBus.hpp"
+#include "st_asio_wrapper/st_asio_wrapper_base.h"
+#include "st_asio_wrapper/st_asio_wrapper_tcp_client.h"
 
 using namespace st_asio_wrapper;
-
-//extern MessageBus g_bus;
 
 /*! @class
 *******************************************************************************
@@ -72,11 +68,11 @@ private:
         public:
             MyConnector(boost::asio::io_service& io_service_) : st_connector(io_service_)
             {
-                attitude_process_ = new AttitudeProtocolProcess;
+
             }
             ~MyConnector()
             {
-                delete attitude_process_;
+
             }
 
         protected:
@@ -92,6 +88,7 @@ private:
             *******************************************************************************/
             virtual void on_msg_handle(MsgType &msg)
             {
+/*
                 // 将 std::string -> QByteArray
                 QByteArray byte_msg;
 
@@ -114,10 +111,8 @@ private:
 
                 // 将物理数据结构体发送到消息总线上
                 //g_bus.SendReq<void, const MspAttitudeDownDC&>(attitude_process_->attitude_dc_, "MspAttitudeDownDC");
+                */
             }
-        private:
-            AttitudeProtocolProcess *attitude_process_;
-
     };
 
 private:

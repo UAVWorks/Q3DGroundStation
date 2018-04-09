@@ -7,8 +7,6 @@ namespace Ui {
 class HUD;
 }
 
-struct MspAttitudeDownDC;
-
 class HUD : public QWidget
 {
   Q_OBJECT
@@ -18,7 +16,7 @@ public:
   ~HUD();
 
 public slots:
-  void UpdateHUD(const MspAttitudeDownDC &maddc);
+  //void UpdateHUD(const MspAttitudeDownDC &maddc);
 
 private:
   Ui::HUD *ui;

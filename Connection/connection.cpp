@@ -7,21 +7,13 @@
 #include <QTimer>
 
 #include "../Tcp/tcp_client.h"
-#include "../MSProtocol/attitude_protocol_process.h"
-#include "../MSProtocol/motor_protocol_process.h"
-#include "../MSProtocol/msp_protocol_process_interface.h"
-#include "../MSProtocol/rc_protocol_process.h"
-
 
 Connection::Connection(QWidget *parent) :
   QWidget(parent),
   ui(new Ui::Connection),
   tcp_client_(nullptr),
   serial_(new QSerialPort(this)),
-  timer_(new QTimer(this)),
-  attitude_process_(new AttitudeProtocolProcess),
-  motor_process_(new MotorProtocolProcess),
-  rc_process_(new RcProtocolProcess)
+  timer_(new QTimer(this))
 {
   ui->setupUi(this);
 
@@ -49,7 +41,6 @@ Connection::~Connection()
     delete serial_;
   }
 
-  // release protocol process object!
 }
 
 
@@ -134,7 +125,7 @@ void Connection::on_serial_connect_clicked()
 ***********************************************************************/
 void Connection::ReadData() {
   QByteArray in_data = serial_->readAll();
-
+/*
   MessageHeader msg_header;
 
   // get msg header
@@ -162,6 +153,7 @@ void Connection::ReadData() {
     default:
       break;
   }
+*/
 }
 
 
@@ -183,8 +175,8 @@ void Connection::WriteData(const QByteArray &out_data) {
 void Connection::on_request_data_btn_clicked()
 {
   if (ui->request_data_btn->text() == QObject::tr("Request Data")) {
-    // 50 ms
-    timer_->start(20);
+    // Serial request data frequency should be > Meter update frequency
+    timer_->start(100);
     ui->request_data_btn->setText(QObject::tr("Stop Request"));
   } else {
     timer_->stop();
@@ -202,6 +194,7 @@ void Connection::on_request_data_btn_clicked()
 * Time: 2018/4/6 cdeveloper
 */
 void Connection::TimerUpdate() {
+/*
   // send data to serial
   QByteArray out_data;
 
@@ -216,6 +209,7 @@ void Connection::TimerUpdate() {
   // pack rc
   //rc_process_->Pack(out_data);
   //WriteData(out_data);
+*/
 }
 
 

@@ -19,9 +19,6 @@ class osgGA::EventQueue;
 class QEvent;
 class QTimer;
 
-struct MspAttitudeDownDC;
-
-
 class RotateCallback : public osg::NodeCallback {
 public:
   RotateCallback() : roll_(0.0), pitch_(0.0), yaw_(0.0) {
@@ -58,7 +55,7 @@ public:
   void setScale(qreal X, qreal Y);
 
 public slots:
-  void Update3D(const MspAttitudeDownDC &maddc);
+  //void Update3D(const MspAttitudeDownDC &maddc);
 
 protected:
 

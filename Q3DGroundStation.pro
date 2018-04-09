@@ -29,9 +29,6 @@ win32: DEFINES += WIN32 _WINDOWS _USE_MATH_DEFINES
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    MSProtocol/attitude_protocol_process.cpp \
-    MSProtocol/msp_protocol_convert_to_real_data.cpp \
-    MSProtocol/msp_protocol_process_interface.cpp \
     Connection/connection.cpp \
     Tcp/tcp_client.cpp \
     3D/qt_osg_widget.cpp \
@@ -40,56 +37,15 @@ SOURCES += \
     Meters/meters.cpp \
     Meters/QMeter/qmeter.cpp \
     Meters/QMeter/qmeterdrawfunctions.cpp \
-    MSProtocol/motor_protocol_process.cpp \
-    QFlightInstruments/qfi_PFD.cpp \
-    QFlightInstruments/qfi_ADI.cpp \
-    QFlightInstruments/qfi_ALT.cpp \
-    QFlightInstruments/qfi_ASI.cpp \
-    QFlightInstruments/qfi_HSI.cpp \
-    QFlightInstruments/qfi_NAV.cpp \
-    QFlightInstruments/qfi_TC.cpp \
-    QFlightInstruments/qfi_VSI.cpp \
     HUD/hud.cpp \
-    MSProtocol/rc_protocol_process.cpp \
-    MSProtocol/altitude_protocol_process.cpp \
-    MSProtocol/analog_protocol_process.cpp \
-    MSProtocol/rctuning_protocol_process.cpp \
-    MSProtocol/pid_protocol_process.cpp \
-    MSProtocol/rcdeadbands_protocol_process.cpp \
-    MSProtocol/motorpins_protocol_process.cpp \
     Meters/QGauge/qgauge.cpp \
     Meters/QGauge/qgaugedrawfunctions.cpp \
     Curve/data_curve.cpp \
-    Meters/QVUMeter/qvumeter.cpp
-
+    Meters/QVUMeter/qvumeter.cpp \
+    QFlightInstruments/qfi_PFD.cpp
 
 HEADERS += \
         mainwindow.h \
-    MessageBus/Any.hpp \
-    MessageBus/function_traits.hpp \
-    MessageBus/MessageBus.hpp \
-    Communication/st_asio_wrapper.h \
-    Communication/st_asio_wrapper_base.h \
-    Communication/st_asio_wrapper_client.h \
-    Communication/st_asio_wrapper_connector.h \
-    Communication/st_asio_wrapper_object_pool.h \
-    Communication/st_asio_wrapper_packer.h \
-    Communication/st_asio_wrapper_server.h \
-    Communication/st_asio_wrapper_server_socket.h \
-    Communication/st_asio_wrapper_service_pump.h \
-    Communication/st_asio_wrapper_socket.h \
-    Communication/st_asio_wrapper_ssl.h \
-    Communication/st_asio_wrapper_tcp_client.h \
-    Communication/st_asio_wrapper_tcp_socket.h \
-    Communication/st_asio_wrapper_timer.h \
-    Communication/st_asio_wrapper_udp_client.h \
-    Communication/st_asio_wrapper_udp_socket.h \
-    Communication/st_asio_wrapper_unpacker.h \
-    MSProtocol/attitude_protocol_process.h \
-    MSProtocol/msp_protocol_convert_to_real_data.h \
-    MSProtocol/msp_protocol_process_interface.h \
-    MSProtocol/msp_protocol_command.h \
-    MSProtocol/msp_protocol_structs.h \
     Connection/connection.h \
     Tcp/tcp_client.h \
     3D/qt_osg_widget.h \
@@ -97,26 +53,11 @@ HEADERS += \
     3D/QtOSG/PickHandler.h \
     Meters/meters.h \
     Meters/QMeter/qmeter.h \
-    MSProtocol/motor_protocol_process.h \
-    QFlightInstruments/qfi_PFD.h \
-    QFlightInstruments/qfi_ADI.h \
-    QFlightInstruments/qfi_ALT.h \
-    QFlightInstruments/qfi_ASI.h \
-    QFlightInstruments/qfi_HSI.h \
-    QFlightInstruments/qfi_NAV.h \
-    QFlightInstruments/qfi_TC.h \
-    QFlightInstruments/qfi_VSI.h \
     HUD/hud.h \
-    MSProtocol/rc_protocol_process.h \
-    MSProtocol/altitude_protocol_process.h \
-    MSProtocol/analog_protocol_process.h \
-    MSProtocol/rctuning_protocol_process.h \
-    MSProtocol/pid_protocol_process.h \
-    MSProtocol/rcdeadbands_protocol_process.h \
-    MSProtocol/motorpins_protocol_process.h \
     Meters/QGauge/qgauge.h \
     Curve/data_curve.h \
-    Meters/QVUMeter/qvumeter.h
+    Meters/QVUMeter/qvumeter.h \
+    QFlightInstruments/qfi_PFD.h
 
 FORMS += \
         mainwindow.ui \
@@ -132,19 +73,31 @@ LIBS += -LE:/OSG/osg_x86/lib/ -lOpenThreadsd -losgd -losgDBd -losgUtild -losgGAd
 #LIBS += -LE:/OSG/osg_x86/lib/ -lOpenThreads -losg -losgDB -losgUtil -losgGA -losgViewer -losgText
 # OSG end config
 
-# Qwt begin config
+# ---------------Qwt begin config---------------
 DEFINES += QT_DLL QWT_DLL
+INCLUDEPATH += E:\Soft\Qt\Qt5.9.4\5.9.4\msvc2013\include\Qwt
 LIBS += -LE:\Soft\Qt\Qt5.9.4\5.9.4\msvc2013\lib -lqwtd
 #LIBS += -LE:\Soft\Qt\Qt5.9.4\5.9.4\msvc2013\lib -lqwt
-INCLUDEPATH += E:\Soft\Qt\Qt5.9.4\5.9.4\msvc2013\include\Qwt
-# Qwt end config
+# ---------------Qwt end config---------------
 
-# Analogwidgets begin config
+# ---------------Analogwidgets begin config---------------
 #INCLUDEPATH += ./analogwidgets/
 #LIBS += ./analogwidgets.lib # 此时的库在 build 目录下
 #LIBS += -LE:\AnalogWidgets -lanalogwidgets # debug 库不能使用
-# Analogwidgets end config
+# ---------------Analogwidgets end config-----------------
 
+
+# ---------------MAVLink V2.0---------------
+INCLUDEPATH += ./mavlink_v2.0
+# ---------------MAVLink V2.0---------------
+
+# ---------------st_asio_wrapper---------------
+#INCLUDEPATH += ./st_asio_wrapper
+# ---------------st_asio_wrapper---------------
+
+# ---------------QFlightInstruments---------------
+# INCLUDEPATH += ./QFlightInstruments
+# ---------------QFlightInstruments---------------
 
 RESOURCES += \
     resources/qfi.qrc \

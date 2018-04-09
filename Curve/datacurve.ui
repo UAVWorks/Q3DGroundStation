@@ -13,20 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QVUMeter" name="qvu" native="true"/>
-   </item>
-  </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QVUMeter</class>
-   <extends>QWidget</extends>
-   <header location="global">Meters\QVUMeter\qvumeter.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

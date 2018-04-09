@@ -6,39 +6,46 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>580</width>
-    <height>400</height>
+    <width>547</width>
+    <height>415</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_6">
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <layout class="QHBoxLayout" name="horizontalLayout_6">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
-          <widget class="QGauge" name="lt_motor" native="true"/>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QGauge" name="lt_motor" native="true"/>
+           </item>
+           <item>
+            <widget class="QGauge" name="rt_motor" native="true"/>
+           </item>
+          </layout>
          </item>
          <item>
-          <widget class="QGauge" name="rt_motor" native="true"/>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
-         <item>
-          <widget class="QGauge" name="lb_motor" native="true"/>
-         </item>
-         <item>
-          <widget class="QGauge" name="rb_motor" native="true"/>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QGauge" name="lb_motor" native="true"/>
+           </item>
+           <item>
+            <widget class="QGauge" name="rb_motor" native="true"/>
+           </item>
+          </layout>
          </item>
         </layout>
        </item>
       </layout>
+     </item>
+     <item>
+      <widget class="QVUMeter" name="qvu" native="true"/>
      </item>
     </layout>
    </item>
@@ -49,6 +56,12 @@
    <class>QGauge</class>
    <extends>QWidget</extends>
    <header location="global">Meters\QGauge\qgauge.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QVUMeter</class>
+   <extends>QWidget</extends>
+   <header location="global">Meters\QVUMeter\qvumeter.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

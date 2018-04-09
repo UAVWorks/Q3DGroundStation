@@ -9,25 +9,16 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QByteArray>
+#include <QPalette>
 #include <boost/scoped_ptr.hpp>
 
-//#include "MessageBus/MessageBus.hpp"
 #include "Connection/connection.h"
-#include "MSProtocol/msp_protocol_structs.h"
-#include "MSProtocol/msp_protocol_process_interface.h"
-#include "MSProtocol/attitude_protocol_process.h"
-#include "MSProtocol/msp_protocol_convert_to_real_data.h"
 #include "Meters/meters.h"
 #include "HUD/hud.h"
 #include "Curve/data_curve.h"
-
 #include "3D/qt_osg_widget.h"
 
-// OSGWidget 功能较多，较为稳定
-#include "3D/QtOSG/OSGWidget.h"
-
-// 全局消息总线，暂时不使用
-//MessageBus g_bus;
+#include "standard/mavlink.h"
 
 void SplitterWindow(MainWindow *w);
 
@@ -68,6 +59,11 @@ void SplitterWindow(MainWindow *w)
     QSplitter *splitter2 = new QSplitter(Qt::Horizontal);
     //QTextEdit *editor2 = new QTextEdit(QObject::tr("Map"));
     Meters *meters = new Meters;
+    // set meters widget bg color = black
+    QPalette pal(meters->palette());
+    pal.setColor(QPalette::Background, Qt::black);
+    meters->setAutoFillBackground(true);
+    meters->setPalette(pal);
 
     QSplitter *splitter3 = new QSplitter(Qt::Vertical);
     QTextEdit *editor3 = new QTextEdit(QObject::tr("Progress"));
@@ -129,9 +125,9 @@ void SplitterWindow(MainWindow *w)
 
     // must be public slot!
     //QObject::connect(connection, &Connection::UpdateAttitude, meters, &Meters::UpdateMeters);
-    QObject::connect(connection, &Connection::UpdateAttitude, hud, &HUD::UpdateHUD);
-    QObject::connect(connection, &Connection::UpdateAttitude, widget_3d, &QtOSGWidget::Update3D);
+    //QObject::connect(connection, &Connection::UpdateAttitude, hud, &HUD::UpdateHUD);
+    //QObject::connect(connection, &Connection::UpdateAttitude, widget_3d, &QtOSGWidget::Update3D);
     //QObject::connect(connection, &Connection::UpdateAttitude, widget_3d, &OSGWidget::Update3D);
-    QObject::connect(connection, &Connection::UpdateMotor, meters, &Meters::UpdateMotor);
+    //QObject::connect(connection, &Connection::UpdateMotor, meters, &Meters::UpdateMotor);
 
 }
