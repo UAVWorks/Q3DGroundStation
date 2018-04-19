@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui svg serialport
+QT       += core gui svg serialport network webengine webenginewidgets webchannel websockets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -30,7 +30,6 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     Connection/connection.cpp \
-    Tcp/tcp_client.cpp \
     3D/qt_osg_widget.cpp \
     3D/QtOSG/OSGWidget.cpp \
     3D/QtOSG/PickHandler.cpp \
@@ -42,12 +41,20 @@ SOURCES += \
     Meters/QGauge/qgaugedrawfunctions.cpp \
     Curve/data_curve.cpp \
     Meters/QVUMeter/qvumeter.cpp \
-    QFlightInstruments/qfi_PFD.cpp
+    Progress/progress.cpp \
+    Map/map.cpp \
+    Warn/warn_item.cpp \
+    Warn/warning.cpp \
+    Compass/compass_widget.cpp \
+    HUD/hud_view.cpp \
+    FlightControl/flight_control.cpp \
+    TachoMeter/tachometer.cpp \
+    shared/websocketclientwrapper.cpp \
+    shared/websockettransport.cpp
 
 HEADERS += \
         mainwindow.h \
     Connection/connection.h \
-    Tcp/tcp_client.h \
     3D/qt_osg_widget.h \
     3D/QtOSG/OSGWidget.h \
     3D/QtOSG/PickHandler.h \
@@ -57,7 +64,17 @@ HEADERS += \
     Meters/QGauge/qgauge.h \
     Curve/data_curve.h \
     Meters/QVUMeter/qvumeter.h \
-    QFlightInstruments/qfi_PFD.h
+    Progress/progress.h \
+    Map/map.h \
+    Warn/warn_item.h \
+    Warn/warning.h \
+    Compass/compass_widget.h \
+    HUD/hud_view.h \
+    FlightControl/flight_control.h \
+    TachoMeter/tachometer.h \
+    shared/websocketclientwrapper.h \
+    shared/websockettransport.h \
+    Map/mapchannel.h
 
 FORMS += \
         mainwindow.ui \
@@ -65,7 +82,15 @@ FORMS += \
     Meters/meters.ui \
     Meters/meters.ui \
     HUD/hud.ui \
-    Curve/datacurve.ui
+    Curve/datacurve.ui \
+    Progress/progress.ui \
+    Map/map.ui \
+    Warn/warnitem.ui \
+    Warn/warning.ui \
+    Compass/compasswidget.ui \
+    HUD/hudview.ui \
+    FlightControl/flightcontrol.ui \
+    TachoMeter/tachometer.ui
 
 # OSG begin config
 INCLUDEPATH += E:/OSG/osg_x86/include
@@ -74,9 +99,9 @@ LIBS += -LE:/OSG/osg_x86/lib/ -lOpenThreadsd -losgd -losgDBd -losgUtild -losgGAd
 # OSG end config
 
 # ---------------Qwt begin config---------------
-DEFINES += QT_DLL QWT_DLL
-INCLUDEPATH += E:\Soft\Qt\Qt5.9.4\5.9.4\msvc2013\include\Qwt
-LIBS += -LE:\Soft\Qt\Qt5.9.4\5.9.4\msvc2013\lib -lqwtd
+#DEFINES += QT_DLL QWT_DLL
+#INCLUDEPATH += E:\Soft\Qt\Qt5.9.4\5.9.4\msvc2013\include\Qwt
+#LIBS += -LE:\Soft\Qt\Qt5.9.4\5.9.4\msvc2013\lib -lqwtd
 #LIBS += -LE:\Soft\Qt\Qt5.9.4\5.9.4\msvc2013\lib -lqwt
 # ---------------Qwt end config---------------
 
@@ -99,9 +124,15 @@ INCLUDEPATH += ./mavlink_v2.0
 # INCLUDEPATH += ./QFlightInstruments
 # ---------------QFlightInstruments---------------
 
+
+#INCLUDEPATH += ./LQInstrumentation
+#LIBS += -LE:\Soft\Qt\Qt5.9.4\5.9.4\msvc2013\lib -lLQInstrumentation
+
+
 RESOURCES += \
     resources/qfi.qrc \
     resources/qvumeter.qrc
 
 DISTFILES += \
-    resources/qvumeter.png
+    resources/qvumeter.png \
+    qwebchannel.js

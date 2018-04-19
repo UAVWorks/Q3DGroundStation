@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Q3DGroundStation Map</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. 
+	   */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+	  
+	  #centerUavUI, #clearPathUI, #restorePathUI, #removeAirspaveUI, #sendTaskSpaceUI {
+        background-color: #fff;
+        border: 2px solid #fff;
+        border-radius: 3px;
+        box-shadow: 0 2px 6px rgba(0,0,0,.3);
+        cursor: pointer;
+        float: left;
+        margin-bottom: 22px;
+        text-align: center;
+      }
+	  
+      #centerUavText, #clearPathText, #clearPathText, #removeAirspaveText, #sendTaskSpaceText {
+        color: rgb(25,25,25);
+        font-family: Roboto,Arial,sans-serif;
+        font-size: 15px;
+        line-height: 25px;
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+	  
+      #clearPathUI, #restorePathUI, #removeAirspaveUI, #sendTaskSpaceUI {
+        margin-left: 12px;
+      }
+	  
+	  .delete-menu {
+        position: absolute;
+        background: white;
+        padding: 3px;
+        color: #666;
+        font-weight: bold;
+        border: 1px solid #999;
+        font-family: sans-serif;
+        font-size: 12px;
+        box-shadow: 1px 3px 3px rgba(0, 0, 0, .3);
+        margin-top: -10px;
+        margin-left: 10px;
+        cursor: pointer;
+      }
+	  
+      .delete-menu:hover {
+        background: #eee;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDD6xQSG5Uq4Eamytgm8-NjmyQulQHsWn8"></script>
+	<script type="text/javascript" src="./qwebchannel.js"></script>
+	
+	<script type="text/javascript">
+		window.onload = function() {
+			var baseUrl = "ws://localhost:12345";
+			
+			var socket = new WebSocket(baseUrl);
+
+			socket.onclose = function() {
+				console.error("web channel closed");
+			};
+			
+			socket.onerror = function(error) {
+				console.error("web channel error: " + error);
+			};
+			
+			socket.onopen = function() { 
+				new QWebChannel(socket, function(channel) {
+					// make map widget object accessible globally
+					window.mapwidget = channel.objects.mapwidget;
+					
+					// connect Qt::Map::SendData signal
+					mapwidget.SendDataToJS.connect(function(message) {
+						// handle message from QT
+					});
+					
+					// send data to Qt::Map::ReceiveData slot function
+					//var taskArray = [28.654752, 115.824807];
+					mapwidget.ReceiveDataFromJS(6); 
+				});
+			}
+		}
+	</script>
+	
+	
+    <script>
+      var map;
+	  var uavMarker;
+	  var NCHU = { lat: 28.654752, lng: 115.824807 };
+	  var uavCurPosition = NCHU;
+	  var uavImage = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
+	  var taskPolyPath;
+	  var infoWindow;
+	  var taskMarkerArray = new Array();
+	  var curMarkNum;
+	  var airspaceHasRemove = false;
+	  
+      function initMap() {
+		// init map
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: NCHU,
+		  mapTypeId: 'terrain', 
+          zoom: 15,
+		  zoomControl: true,
+          scaleControl: true,
+        });
+		
+		// init uav marker
+		uavMarker = new google.maps.Marker({ 
+			position: NCHU, 
+			map: map,
+			title: 'uav current position',
+			icon: uavImage,
+			draggable: true
+		});
+		
+		// init infowindow in NCHU
+		infoWindow = new google.maps.InfoWindow({map: map});
+		infoWindow.setPosition(NCHU);
+		infoWindow.setContent('NCHU');
+		
+		// test path
+		locate(28.654752, 115.824807);
+		locate(28.654752, 115.834807);
+		locate(28.644752, 115.834807);
+		locate(28.644752, 115.824807);
+				
+		// Create the DIV to hold the control and call the centerControl() constructor passing in this DIV
+        var centerControlDiv = document.createElement('div');
+        var centerControl = new CenterControl(centerControlDiv, map);
+        centerControlDiv.index = 1;
+		centerControlDiv.style['padding-top'] = '10px';
+        map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv);
+		
+		// init taskPolyPath
+		initTaskPoly();
+		
+		// init deleteMenu
+		initDeleteMenu();
+		
+		map.addListener('click', addAirspacePoint);
+	  }
+	  
+	  
+	  var deleteMenu;
+	  function initDeleteMenu() {
+		deleteMenu = new DeleteMenu();
+        google.maps.event.addListener(taskPolyPath, 'rightclick', function(e) {
+          // Check if click was on a vertex control point
+          if (e.vertex == undefined) {
+            return;
+          }
+		  
+          deleteMenu.open(map, taskPolyPath.getPath(), e.vertex);
+        });	
+	  }
+	  
+	 
+	  /**
+       * A menu that lets a user delete a selected vertex of a path.
+       * @constructor
+       */
+      function DeleteMenu() {
+        this.div_ = document.createElement('div');
+        this.div_.className = 'delete-menu';
+        this.div_.innerHTML = 'Delete';
+
+        var menu = this;
+        google.maps.event.addDomListener(this.div_, 'click', function(e) {
+		  // 阻止事件传递到 body，防止重新触发 addAirspacePoint 事件
+		  stopBubble(e);
+          menu.removeVertex();
+        });
+      };
+	  
+      DeleteMenu.prototype = new google.maps.OverlayView();
+
+      DeleteMenu.prototype.onAdd = function() {
+        var deleteMenu = this;
+        var map = this.getMap();
+        this.getPanes().floatPane.appendChild(this.div_);
+
+        // mousedown anywhere on the map except on the menu div will close the
+        // menu.
+        this.divListener_ = google.maps.event.addDomListener(map.getDiv(), 'mousedown', function(e) {
+          if (e.target != deleteMenu.div_) {
+            deleteMenu.close();
+          }
+        }, true);
+      };
+
+      DeleteMenu.prototype.onRemove = function() {
+        google.maps.event.removeListener(this.divListener_);
+        this.div_.parentNode.removeChild(this.div_);
+
+        // clean up
+        this.set('position');
+        this.set('path');
+        this.set('vertex');
+      };
+
+      DeleteMenu.prototype.close = function() {
+        this.setMap(null);
+      };
+
+      DeleteMenu.prototype.draw = function() {
+        var position = this.get('position');
+        var projection = this.getProjection();
+
+        if (!position || !projection) {
+          return;
+        }
+
+        var point = projection.fromLatLngToDivPixel(position);
+        this.div_.style.top = point.y + 'px';
+        this.div_.style.left = point.x + 'px';
+      };
+
+      /**
+       * Opens the menu at a vertex of a given path.
+       */
+      DeleteMenu.prototype.open = function(map, path, vertex) {
+        this.set('position', path.getAt(vertex));
+        this.set('path', path);
+        this.set('vertex', vertex);
+        this.setMap(map);
+        this.draw();
+      };
+
+      /**
+       * Deletes the vertex from the path and remove mark
+       */
+      DeleteMenu.prototype.removeVertex = function() {
+        var path = this.get('path');
+        var vertex = this.get('vertex');
+
+        if (!path || vertex == undefined) {
+		  infoWindow.setContent('!path || vertex == undefined');
+		  infoWindow.setPosition(NCHU);
+          this.close();
+          return;
+        }
+		
+		// remove marker, This code has Bug!!!
+		taskMarkerArray[vertex].setVisible(false);
+		taskMarkerArray.splice(vertex, 1);
+		
+		path.removeAt(vertex);
+        this.close();
+      };
+	  
+	  /**
+	   * This code has Bug!!!
+	   */
+	  function resetMarkTitle() {
+		var path = taskPolyPath.getPath();
+		var curPos;
+		for (var i = 0; i < path.getLength(); i++) {
+			curPos = {lat: path.getAt(i).lat(), lng: path.getAt(i).lng()}
+			taskMarkerArray[i].setTitle('#' + i + '(' + curPos.lat + ', ' + curPos.lng + ')');
+		}
+	  }
+	  
+	  
+	  /**
+	   * init taskPolyPath
+	   */
+	  function initTaskPoly() {
+		taskPolyPath = new google.maps.Polygon({
+		  editable: true,
+          strokeColor: '#FF0000',
+          strokeOpacity: 1.0,
+          strokeWeight: 2,
+		  fillColor: '#FF0000',
+          fillOpacity: 0.35,
+		  draggable: true,
+          geodesic: true
+        });
+		
+		
+		google.maps.event.addListener(taskPolyPath.getPath(), "insert_at", insertPoint);
+		//google.maps.event.addListener(taskPolyPath.getPath(), "remove_at", removePoint);
+		google.maps.event.addListener(taskPolyPath.getPath(), "set_at", movePoint);
+		
+        taskPolyPath.setMap(map);
+	  }
+	  
+	  /**
+	   * insert point and marker
+	   */
+	  function insertPoint(evt) {
+		var path = taskPolyPath.getPath();
+		var curPos = {lat: path.getAt(evt).lat(), lng: path.getAt(evt).lng()}
+		
+		var marker = new google.maps.Marker({
+			position: curPos,
+			title: '#' + evt + '(' + curPos.lat + ', ' + curPos.lng + ')',
+			map: map
+		});
+
+		// add to mark array
+		taskMarkerArray.push(marker);	
+
+		
+		var showStr = "insert: " + path.getAt(evt).toUrlValue(6);
+		infoWindow.setContent(showStr);
+		infoWindow.open(map);
+	  }
+	  
+	  /**
+	   * This function not use !
+	   */
+	  function removePoint(evt) {
+	    /*
+		var path = taskPolyPath.getPath();
+		var curPos = {lat: path.getAt(evt).lat(), lng: path.getAt(evt).lng()}
+		taskMarkerArray[evt].setVisible(false);
+		*/
+	  }
+	  
+	  
+	  /**
+	   * delete menu, remove marker
+	   * This function not use !
+	   */
+	  function removeMark(event) {
+		/*
+		for (i in taskMarkerArray) {
+		  if (taskMarkerArray[i].getPosition().toUrlValue(6) == event.latLng.toUrlValue(6)) {
+			taskMarkerArray[i].setVisible(false);
+		  }
+		}
+		*/
+	  }
+	  
+	  /**
+	   * move point
+	   */
+	  function movePoint(evt) {
+	    var path = taskPolyPath.getPath();
+		taskMarkerArray[evt].setPosition(path.getAt(evt));
+		
+		// update marker title
+		var curPos = {lat: path.getAt(evt).lat(), lng: path.getAt(evt).lng()};
+		taskMarkerArray[evt].setTitle('#' + evt + '(' + curPos.lat + ', ' + curPos.lng + ')');
+	  }
+	  
+
+	  
+	  /**
+	   * locate
+	   */
+	  function locate(lat, lng) {
+	    var curPosition = { lat: lat, lng: lng };
+
+		// Change uav marker position
+		uavMarker.setPosition(curPosition);
+		
+		// Update uav position
+		uavCurPosition = curPosition;
+				
+		// draw Path
+		drawLineToCurPosition(curPosition);
+		
+		//map.setCenter(curPosition);
+	  }
+	  
+	  var position1 = NCHU;
+	  var position2 = position1;
+	  var flightPath;
+	  var historyPath = new Array();
+
+	  /**
+	   * draw flight path
+	   */
+	  function drawLineToCurPosition(curPosition) {
+		position2 = curPosition;
+	    var flightCoordinates = [position1, position2];
+		
+		// 路径线
+		flightPath = new google.maps.Polyline({
+			path : flightCoordinates,
+			geodesic : true,
+			strokeColor : '#FF00FF',
+			strokeOpacity : 1.0,
+			strokeWeight : 2
+		});
+		
+		flightPath.setMap(map);
+		historyPath.push(flightPath);
+		position1 = position2;
+		
+		// 暂时没有测试该段代码
+		if(historyPath.length == 800) {
+			historyPath.shift().setMap(null);
+		}
+	  }
+	  
+	  /**
+	   * clear all flight path
+	   */
+	  function clearPath() {
+		for (i in historyPath) {
+			historyPath[i].setMap(null);
+   		}
+   		
+		pathIsClear = false;
+	  }
+	  
+	  
+	  
+	  var pathIsClear = false;
+	  
+	  /**
+	   * restore all flight path
+	   */
+	  function restorePath() {
+		if (!pathIsClear) {
+			for (i in historyPath) {
+			  historyPath[i].setMap(map);
+			}
+			pathIsClear = true;
+		}
+	  }
+	  
+	  /** 
+	   * Handles click events on a map, and adds a new point to the Polyline.
+	   */
+      function addAirspacePoint(event) {
+	    if (airspaceHasRemove) {
+			initTaskPoly();
+			initDeleteMenu();
+			airspaceHasRemove = false;
+		}
+	  
+        var path = taskPolyPath.getPath();
+
+        // Because path is an MVCArray, we can simply append a new coordinate
+        // and it will automatically appear.
+        path.push(event.latLng);
+
+        // Add a new marker at the new plotted point on the polyline.
+        /*
+		var marker = new google.maps.Marker({
+          position: event.latLng,
+          title: '#' + path.getLength() + event.latLng,
+          map: map
+        });
+		
+		taskMarkerArray.push(marker);
+		*/
+		
+      }
+	  
+	  /** 
+	   * remove all Airspace Point
+	   */
+	  function removeAirspacePoint() {
+		// delete mark
+		for (i in taskMarkerArray) {
+		  taskMarkerArray[i].setMap(null);
+		}
+		
+		// empty marker array
+		taskMarkerArray = [];
+		
+		// hide taskPolyPath
+		taskPolyPath.setMap(null);
+		
+		// delete taskPolyPath
+		delete taskPolyPath;
+		delete deleteMenu;
+		
+		airspaceHasRemove = true;
+	  }
+	  
+	  /**
+	   * stop event bubble
+	   */  
+	  function stopBubble(e) {   
+	    // no IE
+	    if (e && e.stopPropagation) {   
+		  e.stopPropagation();    
+	    } else {
+		  // IE
+		  window.event.cancelBubble = true;   
+	    }
+	  }
+	  
+	  /**
+	   * send task point to uav
+	   * @note No find way to let JS send taskArray to Qt
+	   */
+	  function sendTaskPointArray() {
+		//var taskArray = [];
+		
+		for (i in taskMarkerArray) {
+		  //taskArray.push(taskMarkerArray[i].getPosition().lat());
+		  mapwidget.ReceiveDataFromJS(taskMarkerArray[i].getPosition().lat());
+		  //taskArray.push(taskMarkerArray[i].getPosition().lng());
+		  mapwidget.ReceiveDataFromJS(taskMarkerArray[i].getPosition().lng());
+		} 
+	  }
+	  
+	  
+	  /**
+       * The CenterControl adds a control to the map that recenters the map on NCHU
+       * This constructor takes the control DIV as an argument.
+       * @constructor
+	   * @Note Set UAV pos to map center
+       */
+	  function CenterControl(controlDiv, map) {
+	  
+        // Set CSS for the centerUavUI border.
+        var centerUavUI = document.createElement('div');
+		centerUavUI.id = 'centerUavUI';
+		centerUavUI.title = 'Click to center uav';
+        controlDiv.appendChild(centerUavUI);
+
+        // Set CSS for the centerUavText interior.
+        var centerUavText = document.createElement('div');
+		centerUavText.id = 'centerUavText';
+        centerUavText.innerHTML = 'CU';
+        centerUavUI.appendChild(centerUavText);
+		
+		// Set CSS for the clearPathUI border.
+        var clearPathUI = document.createElement('div');
+        clearPathUI.id = 'clearPathUI';
+        clearPathUI.title = 'Click to clear flight path';
+        controlDiv.appendChild(clearPathUI);
+
+        // Set CSS for the clearPathText interior.
+        var clearPathText = document.createElement('div');
+        clearPathText.id = 'clearPathText';
+        clearPathText.innerHTML = 'CP';
+        clearPathUI.appendChild(clearPathText);
+		
+		// Set CSS for the restorePathUI border.
+        var restorePathUI = document.createElement('div');
+        restorePathUI.id = 'restorePathUI';
+        restorePathUI.title = 'Click to restore flight path';
+        controlDiv.appendChild(restorePathUI);
+
+        // Set CSS for the restorePathText interior.
+        var restorePathText = document.createElement('div');
+        restorePathText.id = 'clearPathText';
+        restorePathText.innerHTML = 'RP';
+        restorePathUI.appendChild(restorePathText);
+		
+		// Set CSS for the removeAirspaveUI border.
+        var removeAirspaveUI = document.createElement('div');
+        removeAirspaveUI.id = 'removeAirspaveUI';
+        removeAirspaveUI.title = 'Click to remove airspace point';
+        controlDiv.appendChild(removeAirspaveUI);
+
+        // Set CSS for the removeAirspaveText interior.
+        var removeAirspaveText = document.createElement('div');
+        removeAirspaveText.id = 'removeAirspaveText';
+        removeAirspaveText.innerHTML = 'RA';
+        removeAirspaveUI.appendChild(removeAirspaveText);
+		
+		
+		// Set CSS for the removeAirspaveUI border.
+        var sendTaskSpaceUI = document.createElement('div');
+        sendTaskSpaceUI.id = 'sendTaskSpaceUI';
+        sendTaskSpaceUI.title = 'Click to send task airspace point to UAV';
+        controlDiv.appendChild(sendTaskSpaceUI);
+
+        // Set CSS for the removeAirspaveText interior.
+        var sendTaskSpaceText = document.createElement('div');
+        sendTaskSpaceText.id = 'sendTaskSpaceText';
+        sendTaskSpaceText.innerHTML = 'STA';
+        sendTaskSpaceUI.appendChild(sendTaskSpaceText);
+
+        // Setup the click event listeners: simply set the map to Chicago.
+        centerUavUI.addEventListener('click', function() {
+          map.setCenter(uavCurPosition);
+        });
+		
+		// Setup the click event listeners: simply set the map to Chicago.
+        clearPathUI.addEventListener('click', function() {
+		  clearPath();
+        });
+		
+	    // Setup the click event listeners: simply set the map to Chicago.
+        restorePathUI.addEventListener('click', function() {
+		  restorePath();
+        });
+		
+	    // Setup the click event listeners: simply set the map to Chicago.
+        removeAirspaveUI.addEventListener('click', function() {
+		  removeAirspacePoint();
+        });
+				
+	    // Setup the click event listeners: simply set the map to Chicago.
+        sendTaskSpaceUI.addEventListener('click', function() {
+		  sendTaskPointArray();
+        });
+      }
+	  
+	  google.maps.event.addDomListener(window, 'load', initMap);
+    </script>
+  </body>
+</html>

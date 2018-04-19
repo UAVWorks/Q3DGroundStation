@@ -40,7 +40,7 @@ public:
   virtual ~OSGWidget();
 
 public slots:
-  void Update3D(const MspAttitudeDownDC &maddc);
+  //void Update3D(const MspAttitudeDownDC &maddc);
 
 protected:
 

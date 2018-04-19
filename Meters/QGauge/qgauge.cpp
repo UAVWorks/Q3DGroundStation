@@ -37,8 +37,8 @@ QGauge::QGauge(QWidget *parent)
    setMaxValue(100);
    setDigitCount(5);
    setValue(0);
-   setLabel("Speed");
-   setUnits("Km/h");
+   setLabel("rs");
+   setUnits("r/m");
    setThreshold(80);
    setCircularBarEnabled(true);
    setCoverGlassEnabled(true);

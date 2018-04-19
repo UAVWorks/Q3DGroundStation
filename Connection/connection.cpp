@@ -5,17 +5,23 @@
 #include <QtSerialPort/QSerialPort>
 #include <QDebug>
 #include <QTimer>
+#include <QUdpSocket>
+//#include "../Tcp/tcp_client.h"
 
-#include "../Tcp/tcp_client.h"
+
+#define SERIAL_READ_ALL_ONCE
 
 Connection::Connection(QWidget *parent) :
   QWidget(parent),
   ui(new Ui::Connection),
-  tcp_client_(nullptr),
+  //tcp_client_(nullptr),
   serial_(new QSerialPort(this)),
-  timer_(new QTimer(this))
+  timer_(new QTimer(this)),
+  socket_(new QUdpSocket(this))
 {
   ui->setupUi(this);
+
+  ui->heartbeat_label->setText(QObject::tr("0"));
 
   // set default ip, port
   ui->tcp_ip->setText(QObject::tr("127.0.0.1"));
@@ -27,15 +33,20 @@ Connection::Connection(QWidget *parent) :
 
   connect(serial_, &QSerialPort::readyRead, this, &Connection::ReadData);
   connect(timer_, &QTimer::timeout, this, &Connection::TimerUpdate);
+
+  socket_->bind(QHostAddress::LocalHost, 10002);
+  connect(socket_, SIGNAL(readyRead()),this, SLOT(ReadyRead()));
 }
 
 Connection::~Connection()
 {
   delete ui;
   // must be release point
+  /*
   if (tcp_client_ != nullptr) {
     delete tcp_client_;
   }
+  */
 
   if (serial_ != nullptr) {
     delete serial_;
@@ -44,14 +55,12 @@ Connection::~Connection()
 }
 
 
-/****************************************************
-* 函数名: on_connect_tcp_clicked
-* 功能: connect tcp msg source
-* 参数: void
-* 返回值: void
-* 备注: 127.0.01, 10002
-* 时间: 2018/4/4 陈登龙
-****************************************************/
+/**
+ * @brief Tcp connect
+ *
+ * @note 127.0.0.1, 10002
+ */
+/*
 void Connection::on_connect_tcp_clicked()
 {
   if (tcp_client_ == nullptr) {
@@ -74,16 +83,14 @@ void Connection::on_connect_tcp_clicked()
     }
   }
 }
+*/
 
 
-/****************************************************
-* 函数名: on_serial_connect_clicked
-* 功能: connect serial
-* 参数: void
-* 返回值: void
-* 备注: COM3, 115200
-* 时间: 2018/4/4 陈登龙
-****************************************************/
+/**
+ * @brief Init serial
+ *
+ * @note COM3, 115200
+ */
 void Connection::on_serial_connect_clicked()
 {
   if (ui->serial_connect->text() == QObject::tr("disconnect")) {
@@ -115,56 +122,83 @@ void Connection::on_serial_connect_clicked()
 }
 
 
-/***********************************************************************
-* 函数名: ReadData
-* 功能: read serial data
-* 参数: void
-* 返回值: void
-* 备注: This slot fun connect QSerialPort::readyRead signal
-* 时间: 2018/4/4 陈登龙
-***********************************************************************/
+/**
+ * @brief Read serial data
+ *
+ * @note This slot fun connect QSerialPort::readyRead signal
+ */
 void Connection::ReadData() {
+  mavlink_message_t msg;
+  mavlink_status_t status;
+
+#ifdef SERIAL_READ_ALL_ONCE
+  // read all serial data.
   QByteArray in_data = serial_->readAll();
-/*
-  MessageHeader msg_header;
 
-  // get msg header
-  MSProtocolProcessInterface::GetMessageHeaderInfo(in_data, msg_header);
-
-  // handle data
-  switch (msg_header.command) {
-    case MSP_ATTITUDE:
-      // unpack
-      attitude_process_->UnPack(in_data);
-      // convert to real data
-      attitude_process_->MspAttitudeDownToDC();
-      // emit signal to update UI
-      emit UpdateAttitude(attitude_process_->attitude_dc_);
-      break;
-    case MSP_MOTOR:
-      motor_process_->UnPack(in_data);
-      motor_process_->MspMotorDownToDC();
-      emit UpdateMotor(motor_process_->motor_down_dc);
-      break;
-    case MSP_RC:
-      rc_process_->UnPack(in_data);
-      rc_process_->MspRcDownToDC();
-      emit UpdateRC(rc_process_->rc_down_dc_);
-    default:
-      break;
+  for (int i = 0; i < in_data.length(); i++) {
+    // What is MAVLINK_COMM_0 ?
+    if (mavlink_parse_char(MAVLINK_COMM_0, in_data[i], &msg, &status)) {
+      switch (msg.msgid) {
+        // Heartbeat
+        case MAVLINK_MSG_ID_HEARTBEAT:
+          mavlink_heartbeat_t heartbeat;
+          // decode MAVLink msg
+          mavlink_msg_heartbeat_decode(&msg, &heartbeat);
+          break;
+        // Attitude
+        case MAVLINK_MSG_ID_ATTITUDE:
+          mavlink_attitude_t attitude;
+          mavlink_msg_attitude_decode(&msg, &attitude);
+          // emit signal to update UI
+          emit UpdateAttitude(attitude);
+        // Attitude
+        case MAVLINK_MSG_ID_ALTITUDE:
+          mavlink_altitude_t altitude;
+          mavlink_msg_altitude_decode(&msg, &altitude);
+          emit UpdateAltitude(altitude);
+        // Battery
+        case MAVLINK_MSG_ID_BATTERY_STATUS:
+          mavlink_battery_status_t battery;
+          mavlink_msg_battery_status_decode(&msg, &battery);
+          emit UpdateBattery(battery);
+          break;
+        // Control system state
+        case MAVLINK_MSG_ID_CONTROL_SYSTEM_STATE:
+          mavlink_control_system_state_t ctl_sys_state;
+          mavlink_msg_control_system_state_decode(&msg, &ctl_sys_state);
+          //emit UpdateCtlSysState(ctl_sys_state);
+        default:
+          break;
+      }
+    }
   }
-*/
+#else
+  uint8_t read_byte = 0;
+  while (serial_->bytesAvailable() > 0) {
+    if (serial_->read(&read_byte, 1) > 0) {
+      // What is MAVLINK_COMM_0 ?
+      if (mavlink_parse_char(MAVLINK_COMM_0, read_byte, &msg, &status)) {
+        switch (msg.msgid) {
+          case MAVLINK_MSG_ID_HEARTBEAT:
+            mavlink_heartbeat_t heartbeat;
+            mavlink_msg_heartbeat_decode(&msg, &heartbeat);
+            // emit signal to update UI
+            break;
+          default:
+            break;
+        }
+      }
+    }
+  }
+#endif
+
+
 }
 
 
-/********************************************************
-* 函数名: WriteData
-* 功 能: write byte array data to serial
-* 参 数: QByteArray
-* 返回值: void
-* 备 注: Must be byte array
-* 时 间: 2018/4/4 陈登龙
-*********************************************************/
+/**
+ * @brief Write byte array data to serial
+ */
 void Connection::WriteData(const QByteArray &out_data) {
   serial_->write(out_data);
 
@@ -186,30 +220,135 @@ void Connection::on_request_data_btn_clicked()
 
 
 /**
-* Function name:
-* Function:
-* Params: void
-* Return: void
-* Note:
-* Time: 2018/4/6 cdeveloper
-*/
+ * @brief Read udp data
+ * @note receive ok
+ */
+void Connection::ReadyRead() {
+  int read_length = socket_->pendingDatagramSize();
+  uint8_t buf[MAVLINK_MAX_PACKET_LEN];
+
+  QHostAddress sender;
+  uint16_t senderPort;
+  // read msg
+  socket_->readDatagram((char*)buf, read_length, &sender, &senderPort);
+
+  // decoding
+  mavlink_message_t msg;
+  mavlink_status_t status;
+  static int heartbeat_time = 0;
+#ifdef SERIAL_READ_ALL_ONCE
+  for (int i = 0; i < read_length; i++) {
+    // What is MAVLINK_COMM_0 ?
+    if (mavlink_parse_char(MAVLINK_COMM_0, buf[i], &msg, &status)) {
+      switch (msg.msgid) {
+        // Heartbeat
+        case MAVLINK_MSG_ID_HEARTBEAT:
+          mavlink_heartbeat_t heartbeat;
+          // decode MAVLink msg
+          mavlink_msg_heartbeat_decode(&msg, &heartbeat);
+          ui->heartbeat_label->setText(QString::number(++heartbeat_time));
+          break;
+        // Attitude
+        case MAVLINK_MSG_ID_ATTITUDE:
+          mavlink_attitude_t attitude;
+          mavlink_msg_attitude_decode(&msg, &attitude);
+          // emit signal to update UI
+          emit UpdateAttitude(attitude);
+        // Attitude
+        case MAVLINK_MSG_ID_ALTITUDE:
+          mavlink_altitude_t altitude;
+          mavlink_msg_altitude_decode(&msg, &altitude);
+          emit UpdateAltitude(altitude);
+        // Battery
+        case MAVLINK_MSG_ID_BATTERY_STATUS:
+          mavlink_battery_status_t battery;
+          mavlink_msg_battery_status_decode(&msg, &battery);
+          emit UpdateBattery(battery);
+          break;
+        // Control system state
+        case MAVLINK_MSG_ID_CONTROL_SYSTEM_STATE:
+          mavlink_control_system_state_t ctl_sys_state;
+          mavlink_msg_control_system_state_decode(&msg, &ctl_sys_state);
+          emit UpdateAirSpeed(ctl_sys_state.airspeed);
+        // GPS
+        case MAVLINK_MSG_ID_GPS_RAW_INT:
+          mavlink_gps_raw_int_t gps;
+          mavlink_msg_gps_raw_int_decode(&msg, &gps);
+          emit UpdateGPS(gps);
+        case MAVLINK_MSG_ID_SYS_STATUS:
+          mavlink_sys_status_t sys_status;
+          mavlink_msg_sys_status_decode(&msg, &sys_status);
+          emit UpdateSysStatusSensor(sys_status);
+        default:
+          break;
+      }
+    }
+  }
+#else
+  uint8_t read_byte = 0;
+  while (serial_->bytesAvailable() > 0) {
+    if (serial_->read(&read_byte, 1) > 0) {
+      // What is MAVLINK_COMM_0 ?
+      if (mavlink_parse_char(MAVLINK_COMM_0, read_byte, &msg, &status)) {
+        switch (msg.msgid) {
+          case MAVLINK_MSG_ID_HEARTBEAT:
+            mavlink_heartbeat_t heartbeat;
+            mavlink_msg_heartbeat_decode(&msg, &heartbeat);
+            // emit signal to update UI
+            break;
+          default:
+            break;
+        }
+      }
+    }
+  }
+#endif
+
+
+
+}
+
+
+/**
+ * @brief Timer Update
+ * @note This is tmp test code
+ */
 void Connection::TimerUpdate() {
-/*
-  // send data to serial
+  mavlink_message_t msg;
+  uint8_t buf[MAVLINK_MAX_PACKET_LEN];
+  uint8_t system_id = 2;
+  uint8_t component_id = 1;
+
+  //mavlink_msg_param_request_read_pack(system_id, component_id, &msg, 1, 1, "SYSID_SW_TYPE", -1);
+  //uint8_t len = mavlink_msg_to_send_buffer(buf, &msg);
+
+  mavlink_heartbeat_t heartbeat;
+  // init heartbeat
+  /*
+  heartbeat.mavlink_version = ;
+  heartbeat.autopilot = ;
+  heartbeat.base_mode = ;
+  heartbeat.custom_mode = ;
+  heartbeat.system_status = ;
+  heartbeat.type = ;
+  */
+
+  // encode MAVLink msg, this msg need to be send to UAV every 1 s
+  mavlink_msg_heartbeat_encode(system_id, component_id, &msg, &heartbeat);
+  // send to buf
+  uint8_t len = mavlink_msg_to_send_buffer(buf, &msg);
+
+  // copy to byte array from buf
   QByteArray out_data;
+  out_data.clear();
+  for (int i = 0; i < len; i++) {
+    out_data.append(buf[i]);
+  }
 
-  // pack attitude
-  attitude_process_->Pack(out_data);
+  // I don`t this function whether to be used
+  // QByteArray::fromRawData(buf, len);
+
   WriteData(out_data);
-
-  // pack motor
-  motor_process_->Pack(out_data);
-  WriteData(out_data);
-
-  // pack rc
-  //rc_process_->Pack(out_data);
-  //WriteData(out_data);
-*/
 }
 
 

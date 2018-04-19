@@ -34,7 +34,7 @@
 
 #include <osgDB/ReadFile>
 
-#include "../../MSProtocol/msp_protocol_convert_to_real_data.h"
+//#include "../../MSProtocol/msp_protocol_convert_to_real_data.h"
 
 namespace
 {
@@ -523,7 +523,7 @@ void OSGWidget::UpdateTimer() {
   update();
 }
 
-
+/*
 void OSGWidget::Update3D(const MspAttitudeDownDC &maddc) {
   // x -> roll, y -> pitch, z -> yaw
   pat_->setAttitude(osg::Quat(maddc.roll, osg::X_AXIS, maddc.pitch, osg::Y_AXIS, maddc.yaw, osg::Z_AXIS));
@@ -531,7 +531,7 @@ void OSGWidget::Update3D(const MspAttitudeDownDC &maddc) {
   viewer_->getView(0)->setSceneData(pat_);
   //_mViewer->setSceneData(pat_);
 }
-
+*/
 
 
 

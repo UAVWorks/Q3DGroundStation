@@ -11,6 +11,7 @@
 #include <osg/PositionAttitudeTransform>
 #include <osgViewer/Viewer>
 
+#include "standard/mavlink.h"
 
 
 class QMouseEvent;
@@ -55,7 +56,7 @@ public:
   void setScale(qreal X, qreal Y);
 
 public slots:
-  //void Update3D(const MspAttitudeDownDC &maddc);
+  void Update3D(const mavlink_attitude_t &attitude);
 
 protected:
 

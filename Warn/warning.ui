@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Warning</class>
+ <widget class="QWidget" name="Warning">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>747</width>
+    <height>499</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="WarnItem" name="gyro_3d" native="true"/>
+       </item>
+       <item>
+        <widget class="WarnItem" name="accel_3d" native="true"/>
+       </item>
+       <item>
+        <widget class="WarnItem" name="mag_3d" native="true"/>
+       </item>
+       <item>
+        <widget class="WarnItem" name="abs_pressure" native="true"/>
+       </item>
+       <item>
+        <widget class="WarnItem" name="diff_pressure" native="true"/>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="WarnItem" name="gps" native="true"/>
+       </item>
+       <item>
+        <widget class="WarnItem" name="optical_flow" native="true"/>
+       </item>
+       <item>
+        <widget class="WarnItem" name="vision_position" native="true"/>
+       </item>
+       <item>
+        <widget class="WarnItem" name="laser_position" native="true"/>
+       </item>
+       <item>
+        <widget class="WarnItem" name="ext_ground_truth" native="true"/>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="WarnItem" name="arc" native="true"/>
+       </item>
+       <item>
+        <widget class="WarnItem" name="as" native="true"/>
+       </item>
+       <item>
+        <widget class="WarnItem" name="yaw_pos" native="true"/>
+       </item>
+       <item>
+        <widget class="WarnItem" name="z_alt_ctl" native="true"/>
+       </item>
+       <item>
+        <widget class="WarnItem" name="xy_pos_ctl" native="true"/>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="WarnItem" name="motor_output" native="true"/>
+       </item>
+       <item>
+        <widget class="WarnItem" name="rc_rec" native="true"/>
+       </item>
+       <item>
+        <widget class="WarnItem" name="gyro_3d2" native="true"/>
+       </item>
+       <item>
+        <widget class="WarnItem" name="accel_3d2" native="true"/>
+       </item>
+       <item>
+        <widget class="WarnItem" name="mag_3d2" native="true"/>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <widget class="WarnItem" name="geofence" native="true"/>
+       </item>
+       <item>
+        <widget class="WarnItem" name="ahrs" native="true"/>
+       </item>
+       <item>
+        <widget class="WarnItem" name="terrain" native="true"/>
+       </item>
+       <item>
+        <widget class="WarnItem" name="motor_reversed" native="true"/>
+       </item>
+       <item>
+        <widget class="WarnItem" name="battery" native="true"/>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>WarnItem</class>
+   <extends>QWidget</extends>
+   <header>Warn\warn_item.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

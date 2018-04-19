@@ -15,15 +15,15 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="qfi_PFD" name="hud" native="true"/>
+    <widget class="HUDView" name="hud" native="true"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>qfi_PFD</class>
+   <class>HUDView</class>
    <extends>QWidget</extends>
-   <header location="global">QFlightInstruments\qfi_pfd.h</header>
+   <header>HUD\hud_view.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

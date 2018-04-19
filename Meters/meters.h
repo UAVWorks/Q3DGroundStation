@@ -3,6 +3,7 @@
 
 #include <QWidget>
 
+#include "common/mavlink.h"
 
 namespace Ui {
 class Meters;
@@ -19,8 +20,10 @@ public:
   ~Meters();
 
 public slots:
-  //void UpdateMeters(const MspAttitudeDownDC &maddc);
-  //void UpdateMotor(const MspMotorDownDC &mmddc);
+  void UpdateAirSpeed(const float air_speed);
+  void UpdateAttitude(const mavlink_attitude_t &attitude);
+  void UpdateGPS(const mavlink_gps_raw_int_t &gps);
+  //void UpdateMotor();
 
 private:
   void TimerUpdate();
@@ -28,6 +31,9 @@ private:
 private:
   Ui::Meters *ui;
   QTimer *timer_;
+  float air_speed_;
+  mavlink_attitude_t attitude_;
+  mavlink_gps_raw_int_t gps_;
 };
 
 #endif // METERS_H

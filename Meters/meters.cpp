@@ -2,20 +2,26 @@
 #include "ui_meters.h"
 
 #include <QTimer>
+#include <QPalette>
 
-
-#include "../MSProtocol/msp_protocol_convert_to_real_data.h"
+//#include "../MSProtocol/msp_protocol_convert_to_real_data.h"
 #include "QMeter/qmeter.h"
 
 
 Meters::Meters(QWidget *parent) :
   QWidget(parent),
   ui(new Ui::Meters),
-  timer_(new QTimer(this))
+  timer_(new QTimer(this)),
+  air_speed_(0.0)
 {
   ui->setupUi(this);
-  ui->qvu->setLeftValue(50);
-  ui->qvu->setRightValue(50);
+
+  ui->motol_1->setScale(100);
+  ui->motol_2->setScale(100);
+  ui->motol_3->setScale(100);
+  ui->motol_4->setScale(100);
+
+  memset(static_cast<void *>(&attitude_), 0, sizeof(attitude_));
 
   // Serial request data frequency should be > Meter update frequency
   timer_->start(20);
@@ -27,25 +33,31 @@ Meters::~Meters()
   delete ui;
 }
 
-/*
-void Meters::UpdateMeters(const MspAttitudeDownDC &maddc) {
 
+void Meters::UpdateAirSpeed(const float air_speed) {
+  air_speed_ = air_speed;
 }
-*/
 
-/*
-// This ops can merge to UpdateMeters
-void Meters::UpdateMotor(const MspMotorDownDC &mmddc) {
-  mmddc_ = mmddc;
+
+void Meters::UpdateAttitude(const mavlink_attitude_t &attitude) {
+  attitude_ = attitude;
 }
-*/
+
+void Meters::UpdateGPS(const mavlink_gps_raw_int_t &gps) {
+  gps_ = gps;
+}
 
 
 void Meters::TimerUpdate() {
-  /*
-  ui->lt_motor->setValue(mmddc_.lt_motor);
-  ui->rt_motor->setValue(mmddc_.rt_motor);
-  ui->lb_motor->setValue(mmddc_.lb_motor);
-  ui->rb_motor->setValue(mmddc_.rb_motor);
-  */
+  ui->compass->setAngle(attitude_.yaw);
+  ui->compass->update();
+
+  ui->motol_1->setSpeed(attitude_.rollspeed);
+  ui->motol_1->UpdateView();
+  ui->motol_2->setSpeed(attitude_.pitchspeed);
+  ui->motol_2->UpdateView();
+  ui->motol_3->setSpeed(attitude_.yawspeed);
+  ui->motol_3->UpdateView();
+  ui->motol_4->setSpeed(attitude_.yawspeed);
+  ui->motol_4->UpdateView();
 }

@@ -10,15 +10,25 @@
 #include <QHBoxLayout>
 #include <QByteArray>
 #include <QPalette>
-#include <boost/scoped_ptr.hpp>
+#include <QtWebEngine>
+#include <QWebChannel>
+#include <QWebSocketServer>
+#include <QDir>
+#include <QFileInfo>
+#include <QDebug>
+
+#include "shared/websocketclientwrapper.h"
+#include "shared/websockettransport.h"
 
 #include "Connection/connection.h"
 #include "Meters/meters.h"
 #include "HUD/hud.h"
 #include "Curve/data_curve.h"
 #include "3D/qt_osg_widget.h"
-
-#include "standard/mavlink.h"
+#include "Progress/progress.h"
+#include "Map/map.h"
+#include "Warn/warning.h"
+#include "FlightControl/flight_control.h"
 
 void SplitterWindow(MainWindow *w);
 
@@ -36,14 +46,40 @@ int main(int argc, char *argv[])
     QSurfaceFormat format;
     format.setVersion(2, 1);
     format.setProfile( QSurfaceFormat::CompatibilityProfile);
-
     QSurfaceFormat::setDefaultFormat(format);
+
+    QtWebEngine::initialize();
 
     MainWindow w;
     SplitterWindow(&w);
+
     w.showMaximized();
 
     return a.exec();
+}
+
+
+void InitWebChannel(Map *map) {
+  QFileInfo jsFileInfo("E:/Qt Project/Graduation Project/Q3DGroundStation/qwebchannel.js");
+
+  // setup the QWebSocketServer
+  QWebSocketServer *server = new QWebSocketServer(QStringLiteral("QWebChannel Standalone Example Server"), QWebSocketServer::NonSecureMode);
+  if (!server->listen(QHostAddress::LocalHost, 12347)) {
+      //qFatal("Failed to open web socket server.");
+      qDebug() << "Failed to open web socket server.";
+      return;
+  }
+
+  // wrap WebSocket clients in QWebChannelAbstractTransport objects
+  WebSocketClientWrapper *clientWrapper = new WebSocketClientWrapper(server);
+
+  // setup the channel
+  QWebChannel *channel = new QWebChannel;
+  QObject::connect(clientWrapper, &WebSocketClientWrapper::clientConnected,
+                   channel, &QWebChannel::connectTo);
+
+  // setup the core and publish it to the QWebChannel
+  channel->registerObject(QStringLiteral("map"), map);
 }
 
 
@@ -52,52 +88,57 @@ void SplitterWindow(MainWindow *w)
     QWidget *wnd = new QWidget;
 
     QSplitter *splitter1 = new QSplitter(Qt::Vertical);
-    //QTextEdit *editor1 = new QTextEdit(QObject::tr("3D"));
+    // 3D 模块
+    QTextEdit *widget_3d2 = new QTextEdit(QObject::tr("3D"));
     QtOSGWidget *widget_3d = new QtOSGWidget(1, 1);
-    //OSGWidget *widget_3d = new OSGWidget();
 
     QSplitter *splitter2 = new QSplitter(Qt::Horizontal);
-    //QTextEdit *editor2 = new QTextEdit(QObject::tr("Map"));
-    Meters *meters = new Meters;
-    // set meters widget bg color = black
-    QPalette pal(meters->palette());
-    pal.setColor(QPalette::Background, Qt::black);
-    meters->setAutoFillBackground(true);
-    meters->setPalette(pal);
+    // 地图模块
+    QTextEdit *map2 = new QTextEdit(QObject::tr("Map"));
+    Map *map = new Map;
 
     QSplitter *splitter3 = new QSplitter(Qt::Vertical);
-    QTextEdit *editor3 = new QTextEdit(QObject::tr("Progress"));
-    //Meters *meters = new Meters;
+    // 告警模块
+    QTextEdit *warn2 = new QTextEdit(QObject::tr("Warn"));
+    Warning *warn = new Warning;
 
-    //QTextEdit *editor4 = new QTextEdit(QObject::tr("DataBase"));
-    DataCurve *curve = new DataCurve;
+    QPalette pal(warn->palette());
+    warn->setAutoFillBackground(true);
+    pal.setColor(QPalette::Background, Qt::black);
+    warn->setPalette(pal);
 
-    splitter3->addWidget(editor3);
-    //splitter3->addWidget(meters);
-    //splitter3->addWidget(editor4);
-    splitter3->addWidget(curve);
+    // 仪表模块
+    QTextEdit *meters2 = new QTextEdit(QObject::tr("Meters"));
+    Meters *meters = new Meters;
+    QPalette pal2(meters->palette());
+    meters->setAutoFillBackground(true);
+    pal2.setColor(QPalette::Background, Qt::black);
+    meters->setPalette(pal2);
 
-    //splitter2->addWidget(editor2);
-    splitter2->addWidget(meters);
+    splitter3->addWidget(warn);
+    splitter3->addWidget(meters);
+
+    splitter2->addWidget(map);
     splitter2->addWidget(splitter3);
 
-    //splitter1->addWidget(editor1);
     splitter1->addWidget(widget_3d);
     splitter1->addWidget(splitter2);
+
     splitter1->setStretchFactor(0, 2);
     splitter1->setStretchFactor(1, 1);
 
     QSplitter *splitter4 = new QSplitter(Qt::Vertical);
-    //QTextEdit *editor5 = new QTextEdit(QObject::tr("Video & HUD"));
+    QTextEdit *hud2 = new QTextEdit(QObject::tr("Video & HUD"));
     HUD *hud = new HUD;
 
-    QTextEdit *editor6 = new QTextEdit(QObject::tr("Flight Control"));
+    QTextEdit *flight_ctl2 = new QTextEdit(QObject::tr("Flight Control"));
+    FlightControl *flight_ctl = new FlightControl;
     //QTextEdit *editor7 = new QTextEdit(QObject::tr("Connect"));
     Connection *connection = new Connection;
     //splitter4->addWidget(editor5);
     splitter4->addWidget(hud);
 
-    splitter4->addWidget(editor6);
+    splitter4->addWidget(flight_ctl);
     splitter4->addWidget(connection);
     splitter4->setStretchFactor(0, 2);
     splitter4->setStretchFactor(1, 1);
@@ -122,12 +163,14 @@ void SplitterWindow(MainWindow *w)
     // 拖拽分割条时，是否实时更新
     //splitter_right->setOpaqueResize(true);
 
-
     // must be public slot!
-    //QObject::connect(connection, &Connection::UpdateAttitude, meters, &Meters::UpdateMeters);
-    //QObject::connect(connection, &Connection::UpdateAttitude, hud, &HUD::UpdateHUD);
-    //QObject::connect(connection, &Connection::UpdateAttitude, widget_3d, &QtOSGWidget::Update3D);
-    //QObject::connect(connection, &Connection::UpdateAttitude, widget_3d, &OSGWidget::Update3D);
-    //QObject::connect(connection, &Connection::UpdateMotor, meters, &Meters::UpdateMotor);
+    QObject::connect(connection, &Connection::UpdateGPS, meters, &Meters::UpdateGPS);
+    QObject::connect(connection, &Connection::UpdateGPS, map, &Map::UpdateGPS);
+    QObject::connect(connection, &Connection::UpdateAttitude, hud, &HUD::UpdateHUD);
+    QObject::connect(connection, &Connection::UpdateAttitude, widget_3d, &QtOSGWidget::Update3D);
+    QObject::connect(connection, &Connection::UpdateAirSpeed, meters, &Meters::UpdateAirSpeed);
+    QObject::connect(connection, &Connection::UpdateAttitude, meters, &Meters::UpdateAttitude);
+    QObject::connect(connection, &Connection::UpdateSysStatusSensor, warn, &Warning::UpdateSysStatusSensor);
 
+    //InitWebChannel(map);
 }

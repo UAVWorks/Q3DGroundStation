@@ -3,6 +3,7 @@
 
 #include <QWidget>
 
+#include "standard/mavlink.h"
 namespace Ui {
 class HUD;
 }
@@ -16,7 +17,7 @@ public:
   ~HUD();
 
 public slots:
-  //void UpdateHUD(const MspAttitudeDownDC &maddc);
+  void UpdateHUD(const mavlink_attitude_t &attitude);
 
 private:
   Ui::HUD *ui;

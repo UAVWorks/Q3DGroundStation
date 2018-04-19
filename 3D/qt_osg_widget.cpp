@@ -166,17 +166,20 @@ osgGA::EventQueue* QtOSGWidget::getEventQueue() const {
 }
 
 
-/*
-void QtOSGWidget::Update3D(const MspAttitudeDownDC &maddc) {
+/**
+ * @brief Update 3D
+ * @param attitude pack
+ * @note This slot fun connect Connection::UpdateAttitude signal
+ */
+void QtOSGWidget::Update3D(const mavlink_attitude_t &attitude) {
 #if USING_ROTATE_CALLBACK
-  rotate_callback_->SetRotateValue(maddc.roll, maddc.pitch, maddc.yaw);
+  rotate_callback_->SetRotateValue(attitude.roll, attitude.pitch, attitude.yaw);
 #else
   pat_ = dynamic_cast<osg::PositionAttitudeTransform*>(_mViewer->getSceneData());
   // x -> roll, y -> pitch, z -> yaw
-  pat_->setAttitude(osg::Quat(maddc.roll, osg::X_AXIS, maddc.pitch, osg::Y_AXIS, maddc.yaw, osg::Z_AXIS));
+  pat_->setAttitude(osg::Quat(attitude.roll, osg::X_AXIS, attitude.pitch, osg::Y_AXIS, attitude.yaw, osg::Z_AXIS));
 #endif
 }
-*/
 
 
 void QtOSGWidget::UpdateTimer(){
