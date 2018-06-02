@@ -99,6 +99,8 @@ public slots:
     void setRightValue(double);
     void setMinValue(double);
     void setMaxValue(double);
+    void setLeftLabel(QString);
+    void setRightLabel(QString);
 
 
 protected:
@@ -121,6 +123,8 @@ private:
     QColor colValue;
     QColor colHigh;
     QColor colLow;
+    QString leftLabel;
+    QString rightLabel;
 
 
 };

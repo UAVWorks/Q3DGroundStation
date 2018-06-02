@@ -4,6 +4,8 @@
 #include <QPainter>
 #include <QTimer>
 
+
+
 HUDView::HUDView(QWidget *parent) :
   QWidget(parent),
   ui(new Ui::HUDView)
@@ -22,8 +24,13 @@ HUDView::HUDView(QWidget *parent) :
   yaw_angle_ = 0.0;
   speed_ = 0.0;
   altitude_ = 0.0;
-  gps_status_ = true;
+  gps_status_ = false;
   battery_remain_ = 0;
+
+  ground_speed_ = 0.0;
+  climb_ = 0.0;
+  heading_ = 0;
+  throttle_ = 0;
 }
 
 HUDView::~HUDView()
@@ -32,6 +39,10 @@ HUDView::~HUDView()
 }
 
 void HUDView::TimerUpdate() {
+  ground_speed_ += 0.1;
+  climb_ += 0.1;
+  heading_ += 1;
+  throttle_ += 1;
 
   battery_remain_ += 1;
   if (battery_remain_ > 100) {
@@ -166,8 +177,10 @@ void HUDView::DrawHudStatus(QPainter &painter, QTransform transform) {
   painter.setPen(Qt::yellow);
   font.setPointSize(10);
   painter.setFont(font);
-  painter.drawText(-30, 125, QObject::tr("NCHU APM"));
-
+  painter.drawText(-115, 125, QObject::tr("ground speed: ") + QString::number(ground_speed_));
+  painter.drawText(-115, 140, QObject::tr("       climb: ") + QString::number(climb_));
+  painter.drawText(25, 125, QObject::tr(" heading: ") + QString::number(heading_));
+  painter.drawText(25, 140, QObject::tr("throttle: ") + QString::number(throttle_));
 
   painter.restore();
 }
@@ -354,12 +367,13 @@ void HUDView::DrawHudPitchScale(QPainter &painter, QTransform transform) {
   // 以俯仰角度为循环单位，俯仰角一更新就重绘刻度线
   int angle = 0;
   int y_offset = 210;
-  for (int pitch_angle = -150 + angle + 80; pitch_angle < 90; pitch_angle += 10) {
+  for (int pitch_angle = -150 + pitch_angle_ + 80; pitch_angle < 90; pitch_angle += 10) {
     painter.drawLine(-30, y_offset, 30, y_offset);
     if (y_offset + 15 < 50) {
       painter.drawLine(-30 + 10, y_offset + 15, 30 - 10, y_offset + 15);
     }
-    painter.drawText(-30 - 17, y_offset, QString::number(pitch_angle));
+    painter.drawText(-30 - 17, y_offset, QString::number(abs(pitch_angle)));
+    painter.drawText(30 + 5, y_offset, QString::number(abs(pitch_angle)));
 
     if (y_offset > 90 || y_offset < -50) {
       painter.setPen(Qt::transparent);
@@ -632,15 +646,16 @@ void HUDView::DrawHudBgColor(QPainter &painter, QTransform transform) {
 }
 
 void HUDView::setRoll(const double roll_angle) {
-  roll_angle_ = roll_angle;
+  // radians -> degrees
+  roll_angle_ = (180 / 3.14159) * roll_angle;
 }
 
 void HUDView::setPitch(const double pitch_angle) {
-  pitch_angle_ = pitch_angle;
+  pitch_angle_ = (180 / 3.14159) * pitch_angle;
 }
 
 void HUDView::setYaw(const double yaw_angle) {
-  yaw_angle_ = yaw_angle;
+  yaw_angle_ = (180 / 3.14159) * yaw_angle;
 }
 
 void HUDView::setSpeed(const double speed) {
@@ -649,6 +664,31 @@ void HUDView::setSpeed(const double speed) {
 
 void HUDView::setAltitude(const double altitude) {
   altitude_ = altitude;
+}
+
+void HUDView::setGroundSpeed(const double ground_speed) {
+  ground_speed_ = ground_speed;
+}
+
+void HUDView::setClimb(const double climb) {
+  climb_ = climb;
+}
+
+void HUDView::setHeading(const int16_t heading) {
+  heading_ = heading;
+}
+
+void HUDView::setThrottle(const uint16_t throttle) {
+  throttle_ = throttle;
+}
+
+
+void HUDView::setBattery(const double battery_remain) {
+  battery_remain_ = battery_remain;
+}
+
+void HUDView::setGPS(const bool gps_status) {
+  gps_status_ = gps_status;
 }
 
 void HUDView::UpdateView() {

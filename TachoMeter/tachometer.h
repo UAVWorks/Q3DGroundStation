@@ -23,7 +23,6 @@ protected:
 private:
   void TimerUpdate();
 
-
 private:
   void DrawStaticBarkGround(QPainter &painter);
   void DrawDynamicPointer(QPainter &painter, QTransform transform);
@@ -31,11 +30,13 @@ private:
 public:
   void setSpeed(double speed);
   void setScale(int scale);
+  void setShowText(QString show_text);
   void UpdateView();
 
 private:
   Ui::Tachometer *ui;
   QTimer *timer_;
+  QString show_text_;
   double speed_;
   int scale_;
 };

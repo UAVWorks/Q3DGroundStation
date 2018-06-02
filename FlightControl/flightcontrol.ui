@@ -6,43 +6,111 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>745</width>
+    <height>163</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QPushButton" name="unlock">
-       <property name="text">
-        <string>解锁</string>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QPushButton" name="unlock">
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(60, 60, 60);
+color: rgb(255, 255, 255);</string>
+         </property>
+         <property name="text">
+          <string>Unlock</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="set_mode">
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(60, 60, 60);
+color: rgb(255, 255, 255);</string>
+         </property>
+         <property name="text">
+          <string>SetMode</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="take_off">
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(60, 60, 60);
+color: rgb(255, 255, 255);</string>
+         </property>
+         <property name="text">
+          <string>TakeOff</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="loiter">
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(60, 60, 60);
+color: rgb(255, 255, 255);</string>
+         </property>
+         <property name="text">
+          <string>Loiter</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
-      <widget class="QPushButton" name="hover">
-       <property name="text">
-        <string>悬停</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="setHigh">
-       <property name="text">
-        <string>定高</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="land">
-       <property name="text">
-        <string>降落</string>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QPushButton" name="land">
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(60, 60, 60);
+color: rgb(255, 255, 255);</string>
+         </property>
+         <property name="text">
+          <string>Land</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="rtl">
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(60, 60, 60);
+color: rgb(255, 255, 255);</string>
+         </property>
+         <property name="text">
+          <string>RTL</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="mission">
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(60, 60, 60);
+color: rgb(255, 255, 255);</string>
+         </property>
+         <property name="text">
+          <string>Mission</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="key_ctl">
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(60, 60, 60);
+color: rgb(255, 255, 255);</string>
+         </property>
+         <property name="text">
+          <string>KeyCtl</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>

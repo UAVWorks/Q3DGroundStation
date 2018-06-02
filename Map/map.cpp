@@ -14,6 +14,8 @@
 
 #include "mapchannel.h"
 
+#define USING_ONLINE_MAP 0
+
 Map::Map(QWidget *parent) :
   QWidget(parent),
   ui(new Ui::Map),
@@ -27,8 +29,13 @@ Map::Map(QWidget *parent) :
   ui->setupUi(this);
 
   web_view_ = new QWebEngineView(this);
+
+#if USING_ONLINE_MAP
   web_view_->load(QUrl("E:/Qt Project/Graduation Project/Q3DGroundStation/Q3DGS_Google_Map.html"));
-  //web_view_->load(QUrl("E:/Q3DGS/GoogleMapAPIV3/Example_GoogleMapAPI.html"));
+#else
+  web_view_->load(QUrl("E:/Q3DGS/GoogleMapAPIV3/Q3DGS_Google_Map_Offline.html"));
+#endif
+
   ui->mapLayout->addWidget(web_view_);
 
   InitWebChannel();
@@ -83,9 +90,9 @@ void Map::RunJavaScript(bool flag) {
 /**
  * @brief Update map uav marker
  */
-void Map::UpdateGPS(const mavlink_gps_raw_int_t &gps) {
-  lat_ = gps.lat;
-  lng_ = gps.lon;
+void Map::UpdateGlobalPositionInt(const mavlink_global_position_int_t &gps) {
+  lat_ = gps.lat / 1.0e7;//gps.lat;
+  lng_ = gps.lon / 1.0e7;
 
   // 定位 + 绘制路径
   QString js_fun = QString("locate(%1, %2);").arg(lat_).arg(lng_);
@@ -106,7 +113,7 @@ void Map::ReceiveData2(const double task_array[]) {
  * @note task_data: lat1, lng1, lat2, lng2, lat3, lng3 ...... latn, lngn
  */
 void Map::HandleJsData(const double task_data) {
-  QMessageBox::information(NULL, "Map Info", QString::number(task_data), QMessageBox::Yes);
+  QMessageBox::information(NULL, "Map Info", QString::number(task_data, 'f', 4), QMessageBox::Yes);
 
   // Call MAVLinkManager send task to UAV
 }

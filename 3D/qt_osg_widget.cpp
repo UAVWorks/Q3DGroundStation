@@ -35,7 +35,7 @@ QtOSGWidget::QtOSGWidget(qreal scaleX, qreal scaleY, QWidget* parent)
   // 创建摄像机
   osg::Camera* camera = new osg::Camera;
   camera->setViewport( 0, 0, this->width(), this->height() );
-  camera->setClearColor( osg::Vec4( 0.9f, 0.9f, 1.f, 1.f ) );
+  //camera->setClearColor( osg::Vec4( 0.9f, 0.9f, 1.f, 1.f ) );
   float aspectRatio = static_cast<float>( this->width()) / static_cast<float>( this->height() );
   camera->setProjectionMatrixAsPerspective( 30.f, aspectRatio, 1.f, 1000.f );
   camera->setGraphicsContext( _mGraphicsWindow );
@@ -103,7 +103,7 @@ void QtOSGWidget::initializeGL() {
 }
 
 void QtOSGWidget::mouseMoveEvent(QMouseEvent* event) {
-  this->getEventQueue()->mouseMotion(event->x()*m_scaleX, event->y()*m_scaleY);
+  //this->getEventQueue()->mouseMotion(event->x()*m_scaleX, event->y()*m_scaleY);
 }
 
 void QtOSGWidget::mousePressEvent(QMouseEvent* event) {
@@ -123,7 +123,7 @@ void QtOSGWidget::mousePressEvent(QMouseEvent* event) {
       break;
   }
 
-  this->getEventQueue()->mouseButtonPress(event->x()*m_scaleX, event->y()*m_scaleY, button);
+  //this->getEventQueue()->mouseButtonPress(event->x()*m_scaleX, event->y()*m_scaleY, button);
 }
 
 void QtOSGWidget::mouseReleaseEvent(QMouseEvent* event) {
@@ -143,7 +143,7 @@ void QtOSGWidget::mouseReleaseEvent(QMouseEvent* event) {
       break;
   }
 
-  this->getEventQueue()->mouseButtonRelease(event->x()*m_scaleX, event->y()*m_scaleY, button);
+  //this->getEventQueue()->mouseButtonRelease(event->x()*m_scaleX, event->y()*m_scaleY, button);
 }
 
 void QtOSGWidget::wheelEvent(QWheelEvent* event) {

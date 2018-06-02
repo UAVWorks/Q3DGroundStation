@@ -11,7 +11,7 @@
 #include <osg/PositionAttitudeTransform>
 #include <osgViewer/Viewer>
 
-#include "standard/mavlink.h"
+#include "common/mavlink.h"
 
 
 class QMouseEvent;

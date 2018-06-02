@@ -6,35 +6,67 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>371</width>
-    <height>303</height>
+    <width>696</width>
+    <height>553</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="3,1">
      <item>
       <layout class="QGridLayout" name="gridLayout">
        <item row="0" column="0" rowspan="2">
-        <widget class="Tachometer" name="motol_1" native="true"/>
+        <widget class="Alt" name="alt" native="true"/>
        </item>
        <item row="0" column="2" rowspan="2">
-        <widget class="Tachometer" name="motol_4" native="true"/>
+        <widget class="Tachometer" name="air_speed" native="true"/>
        </item>
        <item row="2" column="0" rowspan="2">
-        <widget class="Tachometer" name="motol_3" native="true"/>
+        <widget class="Vsi" name="vsi" native="true"/>
        </item>
        <item row="0" column="3" rowspan="2">
         <widget class="CompassWidget" name="compass" native="true"/>
        </item>
        <item row="2" column="2" rowspan="2">
-        <widget class="Tachometer" name="motol_2" native="true"/>
+        <widget class="Tachometer" name="ground_speed" native="true"/>
        </item>
        <item row="2" column="3" rowspan="2">
-        <widget class="Tachometer" name="widget_2" native="true"/>
+        <widget class="AttitudeControl" name="attitude" native="true"/>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <widget class="QVUMeter" name="roll1_pitch2" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QVUMeter" name="throttle3_yaw4" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
@@ -53,6 +85,30 @@
    <class>Tachometer</class>
    <extends>QWidget</extends>
    <header>TachoMeter\tachometer.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AttitudeControl</class>
+   <extends>QWidget</extends>
+   <header>AttitudeCtl\attitude_control.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QVUMeter</class>
+   <extends>QWidget</extends>
+   <header>Meters\QVUMeter\qvumeter.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>Alt</class>
+   <extends>QWidget</extends>
+   <header>Meters\Alt\alt.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>Vsi</class>
+   <extends>QWidget</extends>
+   <header>Meters\Vsi\vsi.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

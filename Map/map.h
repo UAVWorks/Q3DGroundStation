@@ -28,7 +28,7 @@ private slots:
   void RunJavaScript(bool flag);
 
 public slots:
-  void UpdateGPS(const mavlink_gps_raw_int_t &gps);
+  void UpdateGlobalPositionInt(const mavlink_global_position_int_t &gps);
   void ReceiveData2(const double task_array[]);
 
 signals:

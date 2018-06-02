@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui svg serialport network webengine webenginewidgets webchannel websockets
+QT       += core gui svg serialport network webengine webenginewidgets webchannel websockets testlib
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -50,7 +50,17 @@ SOURCES += \
     FlightControl/flight_control.cpp \
     TachoMeter/tachometer.cpp \
     shared/websocketclientwrapper.cpp \
-    shared/websockettransport.cpp
+    shared/websockettransport.cpp \
+    AttitudeCtl/attitude_control.cpp \
+    Connection/mavlink_protocol.cpp \
+    ValueControl/value_control.cpp \
+    Uav/uav.cpp \
+    cmd_param.cpp \
+    FlightControl/track_planning.cpp \
+    Connection/serial_read_thread.cpp \
+    Connection/serial_write_thread.cpp \
+    Meters/Vsi/vsi.cpp \
+    Meters/Alt/alt.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -74,7 +84,18 @@ HEADERS += \
     TachoMeter/tachometer.h \
     shared/websocketclientwrapper.h \
     shared/websockettransport.h \
-    Map/mapchannel.h
+    Map/mapchannel.h \
+    AttitudeCtl/attitude_control.h \
+    Connection/mavlink_protocol.h \
+    q3dgs.h \
+    ValueControl/value_control.h \
+    Uav/uav.h \
+    cmd_param.h \
+    FlightControl/track_planning.h \
+    Connection/serial_read_thread.h \
+    Connection/serial_write_thread.h \
+    Meters/Vsi/vsi.h \
+    Meters/Alt/alt.h
 
 FORMS += \
         mainwindow.ui \
@@ -90,7 +111,14 @@ FORMS += \
     Compass/compasswidget.ui \
     HUD/hudview.ui \
     FlightControl/flightcontrol.ui \
-    TachoMeter/tachometer.ui
+    TachoMeter/tachometer.ui \
+    AttitudeCtl/attitudecontrol.ui \
+    ValueControl/valuecontrol.ui \
+    Uav/uav.ui \
+    cmdparam.ui \
+    FlightControl/trackplanning.ui \
+    Meters/Vsi/vsi.ui \
+    Meters/Alt/alt.ui
 
 # OSG begin config
 INCLUDEPATH += E:/OSG/osg_x86/include
@@ -105,33 +133,15 @@ LIBS += -LE:/OSG/osg_x86/lib/ -lOpenThreadsd -losgd -losgDBd -losgUtild -losgGAd
 #LIBS += -LE:\Soft\Qt\Qt5.9.4\5.9.4\msvc2013\lib -lqwt
 # ---------------Qwt end config---------------
 
-# ---------------Analogwidgets begin config---------------
-#INCLUDEPATH += ./analogwidgets/
-#LIBS += ./analogwidgets.lib # 此时的库在 build 目录下
-#LIBS += -LE:\AnalogWidgets -lanalogwidgets # debug 库不能使用
-# ---------------Analogwidgets end config-----------------
-
 
 # ---------------MAVLink V2.0---------------
-INCLUDEPATH += ./mavlink_v2.0
+INCLUDEPATH += ./mavlink_v1.0
 # ---------------MAVLink V2.0---------------
-
-# ---------------st_asio_wrapper---------------
-#INCLUDEPATH += ./st_asio_wrapper
-# ---------------st_asio_wrapper---------------
-
-# ---------------QFlightInstruments---------------
-# INCLUDEPATH += ./QFlightInstruments
-# ---------------QFlightInstruments---------------
-
-
-#INCLUDEPATH += ./LQInstrumentation
-#LIBS += -LE:\Soft\Qt\Qt5.9.4\5.9.4\msvc2013\lib -lLQInstrumentation
-
 
 RESOURCES += \
     resources/qfi.qrc \
-    resources/qvumeter.qrc
+    resources/qvumeter.qrc \
+    resources/image.qrc
 
 DISTFILES += \
     resources/qvumeter.png \

@@ -13,7 +13,7 @@ Tachometer::Tachometer(QWidget *parent) :
   timer_ = new QTimer(this);
   connect(timer_, &QTimer::timeout, this, &Tachometer::TimerUpdate);
   //timer_->start(100);
-
+  show_text_ = QString("AirSpeed");
   speed_ = 0;
   scale_ = 1000;
 }
@@ -67,7 +67,7 @@ void Tachometer::DrawStaticBarkGround(QPainter &painter) {
   painter.setPen(pen);
   QBrush brush(QColor(0, 0, 10));
   painter.setBrush(brush);
-  //painter.drawEllipse(-145, -145, 290, 290);
+  painter.drawEllipse(-145, -145, 290, 290);
 
   // 绘制刻度
   painter.save();
@@ -92,8 +92,10 @@ void Tachometer::DrawStaticBarkGround(QPainter &painter) {
 
     if (i % 5 == 0) {
       painter.drawLine(0, -100, 0, -(100 + long_line));
+
       // 绘制刻度值
-      painter.drawText(0 - 6, -120, QString::number(i / 5));
+      painter.drawText(0 - 13, -125, QString::number(i * 2));
+
     } else {
       painter.drawLine(0, -100, 0, -(100 + short_line));
     }
@@ -110,9 +112,12 @@ void Tachometer::DrawStaticBarkGround(QPainter &painter) {
   pen.setColor(Qt::white);
   pen.setWidth(2);
   painter.setPen(pen);
-  font.setPointSize(15);
+  font.setPointSize(20);
   painter.setFont(font);
-  painter.drawText(-25, 65, QString("x") + QString::number(scale_));
+  //painter.drawText(-25, 65, QString("x") + QString::number(scale_));
+
+  // draw speed text
+  painter.drawText(-50, 65, show_text_);
 
   painter.restore();
 }
@@ -124,6 +129,7 @@ void Tachometer::DrawDynamicPointer(QPainter &painter, QTransform transform) {
   QPen pen(Qt::white, 2);
   QFont font("楷体", 15);
   painter.setFont(font);
+
   if (speed_ / scale_ < 3) {
     pen.setColor(Qt::white);
   } else if (speed_ / scale_ < 7) {
@@ -131,6 +137,7 @@ void Tachometer::DrawDynamicPointer(QPainter &painter, QTransform transform) {
   } else {
     pen.setColor(Qt::red);
   }
+
   painter.setPen(pen);
   painter.drawText(-20, 95, QString::number(speed_));
 
@@ -181,6 +188,10 @@ void Tachometer::setSpeed(double speed) {
 
 void Tachometer::setScale(int scale) {
   scale_ = scale;
+}
+
+void Tachometer::setShowText(QString show_text) {
+  show_text_ = show_text;
 }
 
 void Tachometer::UpdateView() {

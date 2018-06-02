@@ -171,8 +171,8 @@ OSGWidget::OSGWidget( QWidget* parent,
   sideView->setCameraManipulator( new osgGA::TrackballManipulator );
 
 
-  viewer_->addView( view );
-  //viewer_->addView( sideView );
+  //viewer_->addView( view );
+  viewer_->addView( sideView );
   viewer_->setThreadingModel( osgViewer::CompositeViewer::SingleThreaded );
   viewer_->realize();
 

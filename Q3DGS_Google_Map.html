@@ -118,8 +118,12 @@
           center: NCHU,
 		  mapTypeId: 'terrain', 
           zoom: 15,
+		  panControl: true,
 		  zoomControl: true,
-          scaleControl: true,
+		  mapTypeControl: true,
+		  scaleControl: true,
+		  streetViewControl: true,
+		  overviewMapControl: true
         });
 		
 		// init uav marker
@@ -137,10 +141,10 @@
 		infoWindow.setContent('NCHU');
 		
 		// test path
-		locate(28.654752, 115.824807);
-		locate(28.654752, 115.834807);
-		locate(28.644752, 115.834807);
-		locate(28.644752, 115.824807);
+		//locate(28.654752, 115.824807);
+		//locate(28.654752, 115.834807);
+		//locate(28.644752, 115.834807);
+		//locate(28.644752, 115.824807);
 				
 		// Create the DIV to hold the control and call the centerControl() constructor passing in this DIV
         var centerControlDiv = document.createElement('div');
@@ -312,6 +316,7 @@
 		var marker = new google.maps.Marker({
 			position: curPos,
 			title: '#' + evt + '(' + curPos.lat + ', ' + curPos.lng + ')',
+			animation: google.maps.Animation.DROP,
 			map: map
 		});
 

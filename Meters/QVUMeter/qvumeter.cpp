@@ -32,6 +32,8 @@ QVUMeter::QVUMeter(QWidget *parent) : QWidget(parent)
     max = 100;
     leftVal = 0;
     rightVal = 0;
+    leftLabel = "";
+    rightLabel = "";
 
 }
 
@@ -75,8 +77,8 @@ void QVUMeter::paintBorder()
     QRectF Right(55, 505, 25, 20);
     QFont valFont("Arial", 12, QFont::Bold);
     painter.setFont(valFont);
-    painter.drawText(Left, Qt::AlignCenter, "L");
-    painter.drawText(Right, Qt::AlignCenter, "R");
+    painter.drawText(Left, Qt::AlignCenter, leftLabel);
+    painter.drawText(Right, Qt::AlignCenter, rightLabel);
 
 
 
@@ -265,3 +267,10 @@ QSize QVUMeter::sizeHint() const
 }
 
 
+void QVUMeter::setLeftLabel(QString left_label) {
+  leftLabel = left_label;
+}
+
+void QVUMeter::setRightLabel(QString right_label) {
+  rightLabel = right_label;
+}

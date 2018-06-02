@@ -17,6 +17,7 @@ public:
   explicit HUDView(QWidget *parent = 0);
   ~HUDView();
 
+
 protected:
   void paintEvent(QPaintEvent *event);
   void TimerUpdate();
@@ -32,11 +33,24 @@ private:
   void DrawHudStatus(QPainter &painter, QTransform transform);
 
 public:
+  // Attitude
   void setRoll(const double roll_angle);
   void setPitch(const double pitch_angle);
   void setYaw(const double yaw_angle);
+
+  // VFR_HUD
   void setSpeed(const double speed);
+  void setGroundSpeed(const double ground_speed);
   void setAltitude(const double altitude);
+  void setClimb(const double climb);
+  void setHeading(const int16_t heading);
+  void setThrottle(const uint16_t throttle);
+
+  // Battery status
+  void setBattery(const double battery_remain);
+
+  // GPS
+  void setGPS(const bool gps_status);
   void UpdateView();
 private:
   Ui::HUDView *ui;
@@ -48,6 +62,10 @@ private:
   double altitude_;
   bool gps_status_;
   double battery_remain_;
+  double ground_speed_;
+  double climb_;
+  int16_t heading_;
+  uint16_t throttle_;
 };
 
 #endif // HUD_VIEW_H
